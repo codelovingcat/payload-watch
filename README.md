@@ -157,6 +157,7 @@ The GitHub Issues track the project from the first design decisions through test
 - [#19 — Define safe handling of payload values in reports and errors](https://github.com/codelovingcat/payload-watch/issues/19)
 - [#20 — Measure behavior on large and deeply nested payloads](https://github.com/codelovingcat/payload-watch/issues/20)
 - [#24 — Write complete API reference and practical troubleshooting examples](https://github.com/codelovingcat/payload-watch/issues/24)
+- [#10 — Document the end-to-end workflow and validate package output](https://github.com/codelovingcat/payload-watch/issues/10)
 
 ### Phase 4 — Package quality and release readiness
 
