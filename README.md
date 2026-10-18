@@ -128,22 +128,55 @@ Keeping the first release narrow should let us make the core behavior dependable
 - **Careful with data:** avoid logging full payloads or sensitive values by default; decide how before/after values should be exposed.
 - **Small and focused:** favor a clear core over an oversized feature set.
 
-## Development plan
+## Development roadmap
 
-The project will be developed in small, traceable steps through GitHub Issues. The initial work is to:
+The GitHub Issues track the project from the first design decisions through testing and release preparation. The first 10 issues established the main workstreams; additional issues make the important technical and release tasks more explicit.
 
-1. Define the MVP and the use cases it supports.
-2. Decide what counts as a JSON value and how inputs are supplied.
-3. Design the change-result model and path format.
-4. Implement deterministic recursive comparison.
-5. Define and implement array behavior.
-6. Decide how observed changes may be classified.
-7. Design a readable report format.
-8. Add tests for normal and edge cases.
-9. Document examples and limitations.
-10. Prepare the project for packaging and future npm publication.
+### Phase 1 — Scope and design
 
-These are planning milestones, not claims that the features have already been implemented.
+- [#1 — Define the MVP scope and acceptance criteria](https://github.com/codelovingcat/payload-watch/issues/1)
+- [#3 — Define the JSON input contract and public comparison API](https://github.com/codelovingcat/payload-watch/issues/3)
+- [#4 — Design the change model and JSON path format](https://github.com/codelovingcat/payload-watch/issues/4)
+- [#11 — Specify equality, missing-field, and null semantics](https://github.com/codelovingcat/payload-watch/issues/11)
+- [#12 — Encode JSON paths safely for unusual property names](https://github.com/codelovingcat/payload-watch/issues/12)
+- [#13 — Validate inputs and report actionable errors](https://github.com/codelovingcat/payload-watch/issues/13)
+
+### Phase 2 — Build the core comparison engine
+
+- [#2 — Bootstrap the TypeScript package and test tooling](https://github.com/codelovingcat/payload-watch/issues/2)
+- [#5 — Implement recursive object and primitive comparisons](https://github.com/codelovingcat/payload-watch/issues/5)
+- [#6 — Define and implement deterministic array comparison](https://github.com/codelovingcat/payload-watch/issues/6)
+- [#7 — Define the impact-classification policy](https://github.com/codelovingcat/payload-watch/issues/7)
+- [#14 — Guarantee stable results and avoid mutating input payloads](https://github.com/codelovingcat/payload-watch/issues/14)
+
+### Phase 3 — Reports, examples, and tests
+
+- [#8 — Produce readable summaries and stable structured reports](https://github.com/codelovingcat/payload-watch/issues/8)
+- [#9 — Cover edge cases with a focused regression test suite](https://github.com/codelovingcat/payload-watch/issues/9)
+- [#18 — Create realistic third-party API drift fixtures](https://github.com/codelovingcat/payload-watch/issues/18)
+- [#19 — Define safe handling of payload values in reports and errors](https://github.com/codelovingcat/payload-watch/issues/19)
+- [#20 — Measure behavior on large and deeply nested payloads](https://github.com/codelovingcat/payload-watch/issues/20)
+- [#24 — Write complete API reference and practical troubleshooting examples](https://github.com/codelovingcat/payload-watch/issues/24)
+
+### Phase 4 — Package quality and release readiness
+
+- [#21 — Run build, tests, and type checks on GitHub Actions](https://github.com/codelovingcat/payload-watch/issues/21)
+- [#22 — Define package exports and TypeScript declaration output](https://github.com/codelovingcat/payload-watch/issues/22)
+- [#23 — Choose a license and document contribution expectations](https://github.com/codelovingcat/payload-watch/issues/23)
+- [#25 — Test the packed artifact from a clean consumer project](https://github.com/codelovingcat/payload-watch/issues/25)
+- [#26 — Define semantic versioning and changelog policy](https://github.com/codelovingcat/payload-watch/issues/26)
+- [#27 — Prepare and publish the first npm release](https://github.com/codelovingcat/payload-watch/issues/27)
+
+### Phase 5 — Post-MVP developer experience
+
+These are deliberately later additions. The first version should prove that the core comparison behavior is dependable before we expand into a terminal workflow.
+
+- [#15 — Add a CLI for comparing baseline and current JSON files](https://github.com/codelovingcat/payload-watch/issues/15)
+- [#16 — Add CLI output modes and CI-friendly exit codes](https://github.com/codelovingcat/payload-watch/issues/16)
+- [#17 — Support ignore paths for known volatile fields](https://github.com/codelovingcat/payload-watch/issues/17)
+- [#28 — Review post-MVP extensions and prioritize only validated needs](https://github.com/codelovingcat/payload-watch/issues/28)
+
+This roadmap separates the focused library MVP from later conveniences. Having an issue in the backlog does not mean it is already implemented or must ship in the first release; each issue has its own acceptance criteria.
 
 ## Technology direction
 
