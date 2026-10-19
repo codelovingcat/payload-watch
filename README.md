@@ -181,14 +181,53 @@ These are deliberately later additions. The first version should prove that the 
 
 This roadmap separates the focused library MVP from later conveniences. Having an issue in the backlog does not mean it is already implemented or must ship in the first release; each issue has its own acceptance criteria.
 
-## Technology direction
+## Technology and development setup
 
-- **TypeScript** for the library and public types.
-- **Node.js** as the development and test runtime.
-- **npm** for package management and, when ready, distribution.
-- **Vitest** is a candidate for the test suite; the project will confirm its tooling in the setup issue.
+The initial development toolchain is configured as follows:
 
-Final runtime support, module format, package configuration, and release strategy will be decided before publishing.
+- **Node.js 22.12 or newer** — the minimum runtime is set to meet Vitest 5's documented Node.js requirement.
+- **TypeScript 7** — compiles the source and runs strict type checks.
+- **Vitest 5** — runs the unit test suite.
+- **Vite 8** — installed explicitly because Vitest 5 uses Vite as a peer dependency.
+- **npm** — installs development dependencies and runs project scripts.
+
+The exact tool versions are pinned to compatible major-version ranges in `package.json`. The package is marked private for now so it cannot be accidentally published before the public API, license, package metadata, and release checklist have been reviewed.
+
+### Prerequisites
+
+- Node.js 22.12.0 or newer.
+- npm (included with Node.js).
+
+### Get started
+
+Clone the repository and enter its directory, then run:
+
+```bash
+npm install
+npm run build
+npm run typecheck
+npm test
+```
+
+For watch mode while developing tests:
+
+```bash
+npm run test:watch
+```
+
+### Project structure
+
+```text
+src/
+  index.ts             # Public exports will be designed in Issue #3
+tests/
+  tooling.test.ts      # Initial test-runner smoke test
+tsconfig.json          # Strict TypeScript compiler settings
+vitest.config.ts       # Node.js test configuration
+```
+
+This issue establishes the tooling only. The comparison engine and public API are intentionally not implemented yet; those decisions belong to the next design issues. Package exports and published declaration files will be handled separately before a release.
+
 
 ## Contributing and project status
 
