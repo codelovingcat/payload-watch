@@ -191,7 +191,7 @@ The initial development toolchain is configured as follows:
 - **Vite 8** — installed explicitly because Vitest 5 uses Vite as a peer dependency.
 - **npm** — installs development dependencies and runs project scripts.
 
-The exact tool versions are pinned to compatible major-version ranges in `package.json`. The package is marked private for now so it cannot be accidentally published before the public API, license, package metadata, and release checklist have been reviewed.
+The tools are declared using compatible major-version ranges in `package.json`. A lockfile should be generated once dependencies can be installed from the npm registry. The package is marked private for now so it cannot be accidentally published before the public API, license, package metadata, and release checklist have been reviewed.
 
 ### Prerequisites
 
