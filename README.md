@@ -135,6 +135,7 @@ The GitHub Issues track the project from the first design decisions through test
 The proposed first-release boundaries and testable acceptance criteria live in [the MVP scope document](docs/mvp-scope.md). That document is the working agreement for v0.1; implementation details are finalized through the linked design issues.
 
 The proposed input contract and public API direction are documented in [JSON Input Contract and Public API Proposal](docs/json-input-contract.md). The recursive `JsonValue` types are now defined; the comparison function and its report model will be added after the change-result design is agreed.
+The proposed change record types, JSON Pointer path rules, ordering, and opt-in value exposure are described in [Change Model and Path Format](docs/change-model.md).
 
 ### Phase 1 — Scope and design
 
@@ -222,6 +223,8 @@ npm run test:watch
 ```text
 src/
   index.ts             # Public type exports
+  json-value.ts        # Recursive JSON input types
+  change-model.ts     # Structured change/report types
 tests/
   tooling.test.ts      # Initial test-runner smoke test
 tsconfig.json          # Strict TypeScript compiler settings
