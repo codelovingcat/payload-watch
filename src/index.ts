@@ -8,7 +8,6 @@ export type {
   AddedChange,
   ChangeBase,
   ChangeKind,
-  ChangeValues,
   CompareOptions,
   ComparisonReport,
   JsonPointer,
