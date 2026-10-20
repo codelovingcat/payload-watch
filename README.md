@@ -133,6 +133,7 @@ Keeping the first release narrow should let us make the core behavior dependable
 The GitHub Issues track the project from the first design decisions through testing and release preparation. The first 10 issues established the main workstreams; additional issues make the important technical and release tasks more explicit.
 
 The proposed first-release boundaries and testable acceptance criteria live in [the MVP scope document](docs/mvp-scope.md). That document is the working agreement for v0.1; implementation details are finalized through the linked design issues.
+The proposed input contract and public API direction are documented in [JSON Input Contract and Public API Proposal](docs/json-input-contract.md). The recursive `JsonValue` types are now defined; the comparison function and its report model will be added after the change-result design is agreed.
 
 ### Phase 1 — Scope and design
 
@@ -219,14 +220,14 @@ npm run test:watch
 
 ```text
 src/
-  index.ts             # Public exports will be designed in Issue #3
+  index.ts             # Public type exports
 tests/
   tooling.test.ts      # Initial test-runner smoke test
 tsconfig.json          # Strict TypeScript compiler settings
 vitest.config.ts       # Node.js test configuration
 ```
 
-This issue establishes the tooling only. The comparison engine and public API are intentionally not implemented yet; those decisions belong to the next design issues. Package exports and published declaration files will be handled separately before a release.
+The toolchain is in place, and the recursive `JsonValue` input type is now exported. The comparison function itself is intentionally not implemented yet: its structured return model is being designed in Issue #4. Package exports and published declaration files will be verified separately before a release.
 
 
 ## Contributing and project status
