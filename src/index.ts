@@ -1,6 +1,8 @@
 /**
- * PayloadWatch public exports will be added after the input contract and API
- * are agreed in Issue #3. This intentionally empty entry point keeps the
- * package structure ready without committing to a premature public API.
+ * PayloadWatch public type exports.
+ *
+ * The comparison function's return type will be added once the change model
+ * is finalized in Issue #4. This entry point intentionally exposes only the
+ * agreed input model for now.
  */
-export {};
+export type { JsonArray, JsonObject, JsonPrimitive, JsonValue } from "./json-value.js";
