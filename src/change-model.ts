@@ -24,73 +24,65 @@ export type ChangeKind =
   | "value-changed"
   | "type-changed";
 
-/**
- * Optional before/after data for a reported change.
- *
- * Values are omitted from reports by default to reduce accidental exposure of
- * sensitive API data. They are included only when the caller opts in through
- * the comparison options.
- */
-export type ChangeValues =
-  | {
-      readonly current: JsonValue;
-      readonly previous?: never;
-    }
-  | {
-      readonly previous: JsonValue;
-      readonly current?: never;
-    }
-  | {
-      readonly previous: JsonValue;
-      readonly current: JsonValue;
-    };
-
 /** Common fields for every reported difference. */
-export interface ChangeBase {
+export interface ChangeBase<TKind extends ChangeKind = ChangeKind> {
   /** The category of change. */
-  readonly kind: ChangeKind;
+  readonly kind: TKind;
 
   /**
    * JSON Pointer to the affected value.
    * An empty string denotes the root JSON value.
    */
   readonly path: JsonPointer;
-
-  /**
-   * Present only when value inclusion is explicitly enabled.
-   * This contains values for the affected node, not the entire input payload.
-   */
-  readonly values?: ChangeValues;
 }
 
-/** A value exists at this location only in the current payload. */
-export interface AddedChange extends ChangeBase {
-  readonly kind: "added";
+/**
+ * A value exists at this location only in the current payload.
+ * Before/after data is absent by default and is opt-in through CompareOptions.
+ */
+export interface AddedChange extends ChangeBase<"added"> {
   readonly currentType: JsonValueType;
+  readonly values?: {
+    readonly current: JsonValue;
+  };
 }
 
-/** A value exists at this location only in the previous payload. */
-export interface RemovedChange extends ChangeBase {
-  readonly kind: "removed";
+/**
+ * A value exists at this location only in the previous payload.
+ * Before/after data is absent by default and is opt-in through CompareOptions.
+ */
+export interface RemovedChange extends ChangeBase<"removed"> {
   readonly previousType: JsonValueType;
+  readonly values?: {
+    readonly previous: JsonValue;
+  };
 }
 
-/** A primitive value changed while retaining the same JSON type. */
-export interface ValueChangedChange extends ChangeBase {
-  readonly kind: "value-changed";
+/**
+ * A primitive value changed while retaining the same JSON type.
+ * Values are available only when the caller explicitly opts in.
+ */
+export interface ValueChangedChange extends ChangeBase<"value-changed"> {
   readonly previousType: JsonValueType;
   readonly currentType: JsonValueType;
+  readonly values?: {
+    readonly previous: JsonPrimitive;
+    readonly current: JsonPrimitive;
+  };
 }
 
 /**
  * A value changed from one JSON type to a different JSON type.
  * The change is reported at this location instead of recursively reporting
- * every descendant of the replaced value.
+ * every descendant of the replaced value. Values are opt-in.
  */
-export interface TypeChangedChange extends ChangeBase {
-  readonly kind: "type-changed";
+export interface TypeChangedChange extends ChangeBase<"type-changed"> {
   readonly previousType: JsonValueType;
   readonly currentType: JsonValueType;
+  readonly values?: {
+    readonly previous: JsonValue;
+    readonly current: JsonValue;
+  };
 }
 
 /** A discriminated union of all supported change records. */
