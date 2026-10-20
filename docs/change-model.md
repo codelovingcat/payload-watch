@@ -118,7 +118,6 @@ The types in `src/change-model.ts` are exported from the package entry point:
 - `ChangeKind`
 - `JsonPointer`
 - `JsonValueType`
-- `ChangeValues`
 - `ChangeBase`
 - `AddedChange`
 - `RemovedChange`
