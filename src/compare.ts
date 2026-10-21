@@ -8,7 +8,7 @@ import type {
   TypeChangedChange,
   ValueChangedChange,
 } from "./change-model.js";
-import type { JsonObject, JsonPrimitive, JsonValue } from "./json-value.js";
+import type { JsonArray, JsonObject, JsonPrimitive, JsonValue } from "./json-value.js";
 
 function getJsonValueType(value: JsonValue): JsonValueType {
   if (value === null) {
@@ -111,7 +111,13 @@ function compareNode(
   }
 
   if (previousType === "array" && currentType === "array") {
-    // Index-based array comparison is intentionally implemented in Issue #6.
+    compareArrays(
+      previousValue as JsonArray,
+      currentValue as JsonArray,
+      path,
+      includeValues,
+      changes,
+    );
     return;
   }
 
@@ -170,6 +176,41 @@ function compareObjects(
   }
 }
 
+
+function compareArrays(
+  previousArray: JsonArray,
+  currentArray: JsonArray,
+  path: string,
+  includeValues: boolean,
+  changes: PayloadChange[],
+): void {
+  const longestLength = Math.max(previousArray.length, currentArray.length);
+
+  for (let index = 0; index < longestLength; index += 1) {
+    const childPath = appendPointerSegment(path, String(index));
+    const previousHasIndex = index < previousArray.length;
+    const currentHasIndex = index < currentArray.length;
+
+    if (!previousHasIndex) {
+      changes.push(createAddedChange(childPath, currentArray[index]!, includeValues));
+      continue;
+    }
+
+    if (!currentHasIndex) {
+      changes.push(createRemovedChange(childPath, previousArray[index]!, includeValues));
+      continue;
+    }
+
+    compareNode(
+      previousArray[index]!,
+      currentArray[index]!,
+      childPath,
+      includeValues,
+      changes,
+    );
+  }
+}
+
 /**
  * Compare two JSON values and return their observable differences.
  *
@@ -177,9 +218,9 @@ function compareObjects(
  * RFC 6901 JSON Pointer escaping. Before/after values are omitted unless
  * includeValues is explicitly set to true.
  *
- * Arrays with the same outer type are deferred to the index-based behavior
- * implemented in Issue #6. A transition between an array and another JSON type
- * is reported as a type change at the affected path.
+ * Arrays are ordered sequences and are compared by numeric index. The engine
+ * does not infer moves or match array objects by identity. A transition between
+ * an array and another JSON type is reported as a type change at that path.
  */
 export function comparePayloads(
   previousPayload: JsonValue,
