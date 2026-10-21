@@ -8,7 +8,7 @@ It is designed for developers who integrate with external services—such as com
 
 > “The API used to work. What changed in the response?”
 
-> **Project status:** Early implementation. The synchronous `comparePayloads` API now compares nested objects and primitive values. Index-based array comparison and runtime input validation are tracked separately. The package is not published, and the API may continue to evolve.
+> **Project status:** Early implementation. The synchronous `comparePayloads` API compares nested objects, arrays by index, and primitive values. Runtime input validation remains tracked separately. The package is not published, and the API may continue to evolve.
 
 ## Why PayloadWatch?
 
@@ -83,7 +83,7 @@ const report = comparePayloads(previousPayload, currentPayload);
 console.log(report.changes);
 ```
 
-Each change has a kind, a JSON Pointer path, and type metadata. Before/after values are omitted by default and can be enabled with `{ includeValues: true }`. Same-type array contents and runtime input validation are the next separate implementation steps.
+Each change has a kind, a JSON Pointer path, and type metadata. Before/after values are omitted by default and can be enabled with `{ includeValues: true }`. Arrays are compared by index; PayloadWatch does not infer insertions, moves, or object identity. Runtime input validation is a separate implementation step.
 
 ## Who is it for?
 
@@ -132,7 +132,7 @@ The GitHub Issues track the project from the first design decisions through test
 The proposed first-release boundaries and testable acceptance criteria live in [the MVP scope document](docs/mvp-scope.md). That document is the working agreement for v0.1; implementation details are finalized through the linked design issues.
 
 The input contract and public API direction are documented in [JSON Input Contract and Public API Proposal](docs/json-input-contract.md). The recursive `JsonValue` types and synchronous `comparePayloads` function are implemented; index-based array comparison and runtime validation remain separate issues.
-The proposed change record types, JSON Pointer path rules, ordering, and opt-in value exposure are described in [Change Model and Path Format](docs/change-model.md).
+The change record types, JSON Pointer path rules, ordering, and opt-in value exposure are described in [Change Model and Path Format](docs/change-model.md). The index-by-index array policy is documented in [Array Comparison Policy](docs/array-comparison.md).
 
 ### Phase 1 — Scope and design
 
@@ -222,7 +222,7 @@ src/
   index.ts             # Public API and type exports
   json-value.ts        # Recursive JSON input types
   change-model.ts      # Structured change/report types
-  compare.ts           # Recursive object and primitive comparison engine
+  compare.ts           # Recursive object, array, and primitive comparison engine
 tests/
   tooling.test.ts      # Initial test-runner smoke test
   compare.test.ts      # Comparison-engine behavior tests
@@ -230,7 +230,7 @@ tsconfig.json          # Strict TypeScript compiler settings
 vitest.config.ts       # Node.js test configuration
 ```
 
-The toolchain, recursive `JsonValue` types, structured change model, and initial `comparePayloads` implementation are in place. The current engine handles nested objects, primitive changes, additions/removals, type changes, deterministic key ordering, and opt-in before/after values. Index-based array comparison and runtime validation are tracked in Issues #6 and #13. Package exports and published declaration files will be verified separately before release.
+The toolchain, recursive `JsonValue` types, structured change model, and `comparePayloads` implementation are in place. The engine handles nested objects and arrays, primitive changes, additions/removals, type changes, deterministic traversal, and opt-in before/after values. Runtime validation is tracked in Issue #13. Package exports and published declaration files will be verified separately before release.
 
 
 ## Contributing and project status
