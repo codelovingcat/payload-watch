@@ -1,6 +1,6 @@
 # JSON Input Contract and Public API Proposal
 
-**Status:** Proposed design for review  
+**Status:** Approved input contract; runtime validation is pending  
 **Tracking issue:** [#3 — Define the JSON input contract and public comparison API](https://github.com/codelovingcat/payload-watch/issues/3)
 
 This document defines what the first public comparison API is intended to accept. It is a design agreement for review; it does not claim that the comparison function or runtime validator has been implemented.
@@ -18,7 +18,7 @@ comparePayloads(previousPayload, currentPayload)
 - The function compares values already supplied by the caller.
 - It performs no HTTP requests, file access, or other I/O.
 - It must not mutate either input.
-- It returns a structured report. The exact report type and change-item model are intentionally left to [Issue #4 — Design the change model and JSON path format](https://github.com/codelovingcat/payload-watch/issues/4).
+- It returns the structured `ComparisonReport` defined in [Issue #4 — Design the change model and JSON path format](https://github.com/codelovingcat/payload-watch/issues/4).
 
 The function will be synchronous because the MVP compares in-memory values only. It should not return a `Promise` or hide network behavior behind the API.
 
@@ -82,7 +82,7 @@ const currentPayload: unknown = JSON.parse(currentJsonText);
 const report = comparePayloads(previousPayload, currentPayload);
 ```
 
-This is a conceptual usage example; the public function and report type are not implemented yet. The eventual API should make it straightforward to validate values received from `JSON.parse()`, whose return type in TypeScript is commonly treated as `any` unless narrowed.
+The `comparePayloads` function and `ComparisonReport` type are implemented. This example remains conceptual until runtime input validation is added in Issue #13; callers must currently narrow parsed values to `JsonValue` before passing them to the function.
 
 PayloadWatch will not parse JSON strings implicitly. A string supplied directly as a value is compared as a JSON string, not treated as serialized JSON.
 
@@ -103,7 +103,7 @@ This issue proposes and documents:
 - the policy of rejecting unsupported JavaScript-only values rather than coercing them;
 - the distinction between missing object properties and explicit `null`.
 
-The exact change result interfaces, paths, change-kind literals, optional comparison settings, and display format are intentionally not decided here. They belong to the change-model issue so that we can design the result as a coherent whole.
+The change result interfaces, JSON Pointer paths, change-kind literals, and `includeValues` option are defined in Issue #4 and implemented in `src/change-model.ts` and `src/compare.ts`. Runtime invalid-input handling is tracked separately.
 
 ## 8. Acceptance checklist
 
@@ -113,6 +113,6 @@ The exact change result interfaces, paths, change-kind literals, optional compar
 - [x] Non-JSON JavaScript inputs and invalid-input handling policy are documented.
 - [x] Missing properties and explicit `null` are distinguished.
 - [ ] Runtime validation and actionable error behavior are implemented and tested in the dedicated implementation issue.
-- [ ] The final return type and public API are completed once the change model is agreed in Issue #4.
+- [x] The structured report type and public comparison function are implemented based on the agreed change model.
 
 The checkboxes intentionally distinguish design work from implementation work. Completing this issue defines the contract; later issues implement and verify runtime behavior.

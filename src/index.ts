@@ -1,9 +1,10 @@
 /**
- * PayloadWatch public type exports.
+ * PayloadWatch public API and type exports.
  *
- * Runtime comparison behavior will be added with the comparison-engine work
- * after the public input and change models are agreed.
+ * Index-based array comparison and runtime input validation are tracked in
+ * separate implementation issues.
  */
+export { comparePayloads } from "./compare.js";
 export type {
   AddedChange,
   ChangeBase,

@@ -1,9 +1,9 @@
 # PayloadWatch Change Model and Path Format
 
-**Status:** Proposed design for review  
+**Status:** Approved design; core implementation is in progress  
 **Tracking issue:** [#4 — Design the change model and JSON path format](https://github.com/codelovingcat/payload-watch/issues/4)
 
-This document defines the intended shape of a detected change. It specifies the result contract; it does not claim that the comparison engine is implemented.
+This document defines the shape of a detected change. The current comparison engine implements object and primitive differences; same-type array traversal and runtime input validation are tracked separately.
 
 ## 1. Design goals
 
@@ -34,7 +34,7 @@ A change kind is descriptive; it is not a severity or a guarantee of consumer im
 
 ## 3. Structured report shape
 
-The comparison function is intended to return a `ComparisonReport`:
+The synchronous `comparePayloads` function returns a `ComparisonReport`:
 
 ```ts
 interface ComparisonReport {
@@ -51,7 +51,7 @@ Each record has:
 - `previousType` and/or `currentType`: the observed type information appropriate to that change kind;
 - optional `values`: before/after data, present only when the caller explicitly opts in.
 
-The exact function implementation and runtime behavior will follow in the comparison-engine issue. This document and `src/change-model.ts` define the intended data contract.
+The core implementation is in `src/compare.ts`. Same-type array traversal is tracked in Issue #6, and runtime rejection of unsupported JavaScript values is tracked in Issue #13.
 
 ## 4. Why JSON Pointer?
 
@@ -97,7 +97,7 @@ When `includeValues` is enabled, the report can include the value or values asso
 
 This is an opt-in behavior because external API responses may contain personal data, tokens, or business-sensitive values. PayloadWatch will not automatically log, upload, or transmit payload contents. A caller who enables value inclusion remains responsible for handling the resulting report safely.
 
-The `ChangeValues` TypeScript type models the possible before/after shapes. The option and runtime behavior will be implemented with the public comparison function; this issue only establishes the proposed contract.
+The `PayloadChange` types model the possible before/after shapes. The `includeValues` option is implemented by `comparePayloads`; callers remain responsible for safely handling any values they explicitly request.
 
 ## 6. Deterministic ordering
 
@@ -144,7 +144,7 @@ function describeChange(change: PayloadChange): string {
 }
 ```
 
-This snippet demonstrates type narrowing against the proposed union; it does not call an implemented comparison function.
+This snippet demonstrates type narrowing against the exported union.
 
 ## 8. Decisions for review
 
@@ -163,6 +163,5 @@ This snippet demonstrates type narrowing against the proposed union; it does not
 - [x] Value exposure is opt-in and the default is documented.
 - [x] Ordering is defined without locale-dependent sorting.
 - [x] The model distinguishes observed changes from impact classification.
-- [ ] Runtime diff behavior and report formatting are implemented and tested in later issues.
-
-The remaining unchecked item is implementation work, not a missing design decision.
+- [x] Core object and primitive runtime diff behavior is implemented and covered by focused tests.
+- [ ] Same-type array traversal and runtime input validation are completed in their dedicated issues.
