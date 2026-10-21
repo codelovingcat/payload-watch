@@ -3,7 +3,7 @@
 **Status:** Approved design; core implementation is in progress  
 **Tracking issue:** [#4 — Design the change model and JSON path format](https://github.com/codelovingcat/payload-watch/issues/4)
 
-This document defines the shape of a detected change. The current comparison engine implements object and primitive differences; same-type array traversal and runtime input validation are tracked separately.
+This document defines the shape of a detected change. The comparison engine implements recursive object, primitive, and index-based array differences. Runtime input validation is tracked separately.
 
 ## 1. Design goals
 
@@ -51,7 +51,7 @@ Each record has:
 - `previousType` and/or `currentType`: the observed type information appropriate to that change kind;
 - optional `values`: before/after data, present only when the caller explicitly opts in.
 
-The core implementation is in `src/compare.ts`. Same-type array traversal is tracked in Issue #6, and runtime rejection of unsupported JavaScript values is tracked in Issue #13.
+The core implementation is in `src/compare.ts`. Array semantics are documented in [Array Comparison Policy](array-comparison.md). Runtime rejection of unsupported JavaScript values is tracked in Issue #13.
 
 ## 4. Why JSON Pointer?
 
@@ -107,9 +107,9 @@ The report should use deterministic depth-first traversal:
 2. Visit object keys in ascending default JavaScript string sort order, not locale-aware order.
 3. Visit array indexes in ascending numeric order.
 4. Emit a change at a node whose JSON type changed without emitting descendant changes under that replaced node.
-5. For arrays, follow the index-by-index comparison policy defined in [Issue #6](https://github.com/codelovingcat/payload-watch/issues/6).
+5. For arrays, compare indexes in ascending numeric order. If an index exists only in the current array, report an addition; if it exists only in the previous array, report a removal. For shared indexes, recurse using the same object/primitive/type rules.
 
-This makes identical input pairs produce changes in a stable order across runs. The comparison-engine and array issues will turn these rules into tests.
+This makes identical input pairs produce changes in a stable order across runs. The behavior is covered by object, primitive, and array comparison tests.
 
 ## 7. TypeScript contract
 
@@ -164,4 +164,5 @@ This snippet demonstrates type narrowing against the exported union.
 - [x] Ordering is defined without locale-dependent sorting.
 - [x] The model distinguishes observed changes from impact classification.
 - [x] Core object and primitive runtime diff behavior is implemented and covered by focused tests.
-- [ ] Same-type array traversal and runtime input validation are completed in their dedicated issues.
+- [x] Same-type arrays are compared recursively by numeric index, with additions/removals for indexes present on one side only.
+- [ ] Runtime input validation is completed in Issue #13.

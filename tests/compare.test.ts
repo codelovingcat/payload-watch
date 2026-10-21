@@ -199,4 +199,125 @@ describe("comparePayloads", () => {
     expect(previous).toEqual(previousSnapshot);
     expect(current).toEqual(currentSnapshot);
   });
+
+  it("returns no changes for equal empty and populated arrays", () => {
+    expect(comparePayloads([], [])).toEqual({ changes: [] });
+    expect(comparePayloads([1, "two", null], [1, "two", null])).toEqual({ changes: [] });
+  });
+
+  it("reports changed array elements at their numeric indexes", () => {
+    expect(comparePayloads(["ready", "old"], ["ready", "new"])).toEqual({
+      changes: [
+        {
+          kind: "value-changed",
+          path: "/1",
+          previousType: "string",
+          currentType: "string",
+        },
+      ],
+    });
+  });
+
+  it("reports elements beyond the previous array length as additions", () => {
+    expect(comparePayloads([1], [1, "new"])).toEqual({
+      changes: [
+        {
+          kind: "added",
+          path: "/1",
+          currentType: "string",
+        },
+      ],
+    });
+  });
+
+  it("reports elements beyond the current array length as removals", () => {
+    expect(comparePayloads([1, { id: 2 }], [1])).toEqual({
+      changes: [
+        {
+          kind: "removed",
+          path: "/1",
+          previousType: "object",
+        },
+      ],
+    });
+  });
+
+  it("recurses into nested objects and arrays using index paths", () => {
+    expect(
+      comparePayloads(
+        { users: [{ profile: { name: "Deniz" } }] },
+        { users: [{ profile: { name: "Ece" } }] },
+      ),
+    ).toEqual({
+      changes: [
+        {
+          kind: "value-changed",
+          path: "/users/0/profile/name",
+          previousType: "string",
+          currentType: "string",
+        },
+      ],
+    });
+  });
+
+  it("compares reordered items by index without inferring moves", () => {
+    expect(
+      comparePayloads(
+        [{ id: "a" }, { id: "b" }],
+        [{ id: "b" }, { id: "a" }],
+      ).changes.map((change) => [change.kind, change.path]),
+    ).toEqual([
+      ["value-changed", "/0/id"],
+      ["value-changed", "/1/id"],
+    ]);
+  });
+
+  it("does not infer an insertion; it reports observable index differences", () => {
+    expect(comparePayloads([10, 20], [5, 10, 20]).changes).toEqual([
+      {
+        kind: "value-changed",
+        path: "/0",
+        previousType: "number",
+        currentType: "number",
+      },
+      {
+        kind: "value-changed",
+        path: "/1",
+        previousType: "number",
+        currentType: "number",
+      },
+      {
+        kind: "added",
+        path: "/2",
+        currentType: "number",
+      },
+    ]);
+  });
+
+  it("includes array before/after values only when requested", () => {
+    expect(comparePayloads([1], [1, 2], { includeValues: true })).toEqual({
+      changes: [
+        {
+          kind: "added",
+          path: "/1",
+          currentType: "number",
+          values: { current: 2 },
+        },
+      ],
+    });
+  });
+
+  it("reports differences in nested arrays in numeric index order", () => {
+    const report = comparePayloads(
+      [[1, 2], [3]],
+      [[1, 4], [5, 6]],
+    );
+
+    expect(report.changes.map((change) => [change.kind, change.path])).toEqual([
+      ["value-changed", "/0/1"],
+      ["value-changed", "/1/0"],
+      ["added", "/1/1"],
+    ]);
+  });
+
 });
