@@ -77,15 +77,14 @@ describe("formatComparisonReport", () => {
 
   it("serializes opt-in object values with recursively sorted keys", () => {
     const report = comparePayloads(
-      { profile: { z: 1, a: { y: true, b: "old" } } },
-      { profile: { z: 1, a: { y: false, b: "new" } } },
+      {},
+      { profile: { z: 1, a: { y: true, b: "new" } } },
       { includeValues: true },
     );
 
     expect(formatComparisonReport(report, { includeValues: true })).toBe(
-      '2 changes detected:\n' +
-      '1. Value changed at /profile/a/b (type: string) — "old" → "new"\n' +
-      "2. Value changed at /profile/a/y (type: boolean) — true → false",
+      '1 change detected:\n' +
+      '1. Added value at /profile (current type: object) — <missing> → {"a": {"b": "new", "y": true}, "z": 1}',
     );
   });
 
