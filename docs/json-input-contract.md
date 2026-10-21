@@ -1,6 +1,6 @@
 # JSON Input Contract and Public API Proposal
 
-**Status:** Proposed design for review  
+**Status:** Approved input contract; runtime validation is pending  
 **Tracking issue:** [#3 — Define the JSON input contract and public comparison API](https://github.com/codelovingcat/payload-watch/issues/3)
 
 This document defines what the first public comparison API is intended to accept. It is a design agreement for review; it does not claim that the comparison function or runtime validator has been implemented.
