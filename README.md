@@ -101,7 +101,7 @@ A useful scenario is an application that consumes a third-party commerce API. Wh
 
 A payload diff can show **what changed**. By itself, one or two JSON samples cannot always prove whether a change is breaking for every consumer. For example, adding an optional field may be harmless to one application but unexpected for another.
 
-For that reason, PayloadWatch will distinguish observed differences from any policy-based assessment of their impact. If we introduce “potentially breaking” classifications, their rules must be explicit, documented, and tested.
+For the v0.1 MVP, PayloadWatch reports structural differences only and does not label them as breaking, non-breaking, or unknown. A JSON diff alone cannot reliably establish impact for every consumer; the reasoning and examples are documented in [Impact Classification Policy](docs/impact-classification-policy.md). A future consumer-specific classification layer would need explicit, testable rules and must preserve the underlying observed changes.
 
 ### Initial scope
 
@@ -132,7 +132,7 @@ The GitHub Issues track the project from the first design decisions through test
 The proposed first-release boundaries and testable acceptance criteria live in [the MVP scope document](docs/mvp-scope.md). That document is the working agreement for v0.1; implementation details are finalized through the linked design issues.
 
 The input contract and public API direction are documented in [JSON Input Contract and Public API Proposal](docs/json-input-contract.md). The recursive `JsonValue` types and synchronous `comparePayloads` function are implemented; index-based array comparison and runtime validation remain separate issues.
-The change record types, JSON Pointer path rules, ordering, and opt-in value exposure are described in [Change Model and Path Format](docs/change-model.md). The index-by-index array policy is documented in [Array Comparison Policy](docs/array-comparison.md).
+The change record types, JSON Pointer path rules, ordering, and opt-in value exposure are described in [Change Model and Path Format](docs/change-model.md). The index-by-index array policy is documented in [Array Comparison Policy](docs/array-comparison.md). The v0.1 decision to defer impact classification is documented in [Impact Classification Policy](docs/impact-classification-policy.md).
 
 ### Phase 1 — Scope and design
 
