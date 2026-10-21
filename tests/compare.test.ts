@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { comparePayloads } from "../src/compare.js";
+import { comparePayloads } from "../src/index.js";
 
 describe("comparePayloads", () => {
   it("returns no changes for equal primitive values", () => {
