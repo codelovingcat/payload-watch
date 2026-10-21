@@ -153,7 +153,7 @@ This snippet demonstrates type narrowing against the exported union.
 - Keep a `ComparisonReport` wrapper containing the ordered `changes` array.
 - Omit before/after values by default; expose them only when `includeValues: true` is explicitly requested.
 - Sort object keys deterministically, walk arrays by numeric index, and report a replaced node's type change once.
-- Keep impact/severity classification separate from observed change kinds.
+- Keep impact/severity classification separate from observed change kinds; impact classification is deferred from v0.1 as specified in [Impact Classification Policy](impact-classification-policy.md).
 
 ## 9. Acceptance checklist
 
