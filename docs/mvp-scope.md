@@ -84,9 +84,11 @@ PayloadWatch reports what it can observe from the two input values:
 - a value changed;
 - a JSON type changed.
 
-It may be possible to classify some changes as *potentially breaking*, but whether a change breaks a particular application depends on that application's contract and behavior. **The MVP will not claim to prove semantic or consumer-specific breaking changes.** A later, explicitly documented policy can be considered separately.
+**Impact classification is deferred from v0.1.** The MVP reports observed structural differences only; it does not emit a breaking, non-breaking, or unknown impact label. The same structural change can affect consumers differently depending on their schema, validation settings, optionality assumptions, and application logic. For example, removing a required field may break one integration, while removing an unused optional field may have no visible effect.
 
-The report must point to the affected location. The exact change type names and path syntax will be finalized in the change-model design issues.
+A later release may add an explicit, separately designed classification layer if a concrete consumer-specific rule set can be provided. Such a layer must use documented, tested rules, preserve the original observed changes, and say *potentially breaking* rather than claim certainty when the consumer contract is unavailable.
+
+The report must point to the affected location. The change types and path syntax are defined in [Change Model and Path Format](change-model.md). See the [Impact Classification Policy](impact-classification-policy.md) for examples and the rationale for deferring classification.
 
 ## 7. Acceptance criteria
 
