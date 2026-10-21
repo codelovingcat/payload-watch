@@ -103,6 +103,15 @@ export interface CompareOptions {
   readonly includeValues?: boolean;
 }
 
+/** Options for formatting a structured report as readable text. */
+export interface FormatOptions {
+  /**
+   * Include before/after values in the summary when present in the report.
+   * Defaults to false as a second safeguard against accidental exposure.
+   */
+  readonly includeValues?: boolean;
+}
+
 /** The structured result shape returned by a comparison. */
 export interface ComparisonReport {
   /** Changes in deterministic traversal order; empty means no differences. */
