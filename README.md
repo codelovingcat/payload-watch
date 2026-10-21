@@ -2,13 +2,13 @@
 
 **Catch unexpected changes in JSON API responses before they turn into debugging sessions.**
 
-PayloadWatch is a planned TypeScript-first library for comparing JSON API payloads and explaining what changed between a known-good response and a new one.
+PayloadWatch is a TypeScript-first library under development for comparing JSON API payloads and explaining what changed between a known-good response and a new one.
 
 It is designed for developers who integrate with external services—such as commerce, payment, hiring, shipping, or CRM APIs—and need a faster way to answer a frustrating question:
 
 > “The API used to work. What changed in the response?”
 
-> **Project status:** Early planning. The API, rules, and behavior are being defined before implementation. The examples below describe the intended direction and are not a released or working API.
+> **Project status:** Early implementation. The synchronous `comparePayloads` API now compares nested objects and primitive values. Index-based array comparison and runtime input validation are tracked separately. The package is not published, and the API may continue to evolve.
 
 ## Why PayloadWatch?
 
@@ -60,33 +60,30 @@ The planned MVP will explore:
 - **Readable reports** — a concise summary that points developers to the exact JSON path.
 - **Structured results** — a result format suitable for tests, logs, CI checks, and other tools.
 
-The precise comparison rules and public API will be agreed on and tested as part of the project. We will avoid silently treating ambiguous changes as definite breaking changes.
+The public input and change-report contracts are defined. Implementation and tests are being added incrementally, and PayloadWatch will avoid silently treating observed differences as definite breaking changes.
 
-## A conceptual example
+## A basic example
 
-The public API has not been designed yet. A future usage might look something like this:
+After building the project locally, the current source-level API can be used like this:
 
 ```ts
-// Concept only — not implemented API
-const report = comparePayloads(previousResponse, currentResponse);
+import { comparePayloads } from "./dist/index.js";
 
+const previousPayload = {
+  id: 482,
+  customer: { name: "Deniz" },
+};
+
+const currentPayload = {
+  id: "482",
+  customer: { fullName: "Deniz" },
+};
+
+const report = comparePayloads(previousPayload, currentPayload);
 console.log(report.changes);
 ```
 
-For the example above, a report should make changes clear in a form similar to:
-
-```text
-Payload changes detected
-
-- TYPE_CHANGED  $.id
-  number -> string
-
-- FIELD_REMOVED  $.customer.name
-
-- FIELD_ADDED  $.customer.fullName
-```
-
-This output is illustrative. Names, return types, JSON path syntax, and classification rules will be finalized through the design issues before implementation.
+Each change has a kind, a JSON Pointer path, and type metadata. Before/after values are omitted by default and can be enabled with `{ includeValues: true }`. Same-type array contents and runtime input validation are the next separate implementation steps.
 
 ## Who is it for?
 
@@ -134,7 +131,7 @@ The GitHub Issues track the project from the first design decisions through test
 
 The proposed first-release boundaries and testable acceptance criteria live in [the MVP scope document](docs/mvp-scope.md). That document is the working agreement for v0.1; implementation details are finalized through the linked design issues.
 
-The proposed input contract and public API direction are documented in [JSON Input Contract and Public API Proposal](docs/json-input-contract.md). The recursive `JsonValue` types are now defined; the comparison function and its report model will be added after the change-result design is agreed.
+The input contract and public API direction are documented in [JSON Input Contract and Public API Proposal](docs/json-input-contract.md). The recursive `JsonValue` types and synchronous `comparePayloads` function are implemented; index-based array comparison and runtime validation remain separate issues.
 The proposed change record types, JSON Pointer path rules, ordering, and opt-in value exposure are described in [Change Model and Path Format](docs/change-model.md).
 
 ### Phase 1 — Scope and design
@@ -222,16 +219,18 @@ npm run test:watch
 
 ```text
 src/
-  index.ts             # Public type exports
+  index.ts             # Public API and type exports
   json-value.ts        # Recursive JSON input types
-  change-model.ts     # Structured change/report types
+  change-model.ts      # Structured change/report types
+  compare.ts           # Recursive object and primitive comparison engine
 tests/
   tooling.test.ts      # Initial test-runner smoke test
+  compare.test.ts      # Comparison-engine behavior tests
 tsconfig.json          # Strict TypeScript compiler settings
 vitest.config.ts       # Node.js test configuration
 ```
 
-The toolchain is in place, and the recursive `JsonValue` input type is now exported. The comparison function itself is intentionally not implemented yet: its structured return model is being designed in Issue #4. Package exports and published declaration files will be verified separately before a release.
+The toolchain, recursive `JsonValue` types, structured change model, and initial `comparePayloads` implementation are in place. The current engine handles nested objects, primitive changes, additions/removals, type changes, deterministic key ordering, and opt-in before/after values. Index-based array comparison and runtime validation are tracked in Issues #6 and #13. Package exports and published declaration files will be verified separately before release.
 
 
 ## Contributing and project status
