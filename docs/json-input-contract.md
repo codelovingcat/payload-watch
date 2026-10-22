@@ -66,7 +66,7 @@ For example, the following objects are not equivalent:
 {}
 ```
 
-PayloadWatch will treat the missing property and explicit `null` as distinct observable states. The detailed change kinds and report representation belong to [Issue #4](https://github.com/codelovingcat/payload-watch/issues/4) and [Issue #11 — Specify equality, missing-field, and null semantics](https://github.com/codelovingcat/payload-watch/issues/11).
+PayloadWatch treats the missing property and explicit `null` as distinct observable states: adding a property whose value is `null` is reported as `added`, and removing that property is reported as `removed`. Other equality rules, including primitive type distinctions, empty containers, and object-versus-array transitions, are documented with corresponding tests in [Comparison Semantics](comparison-semantics.md).
 
 ## 5. Strings versus parsed JSON values
 
