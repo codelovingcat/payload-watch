@@ -67,7 +67,7 @@ The public input and change-report contracts are defined. Implementation and tes
 After building the project locally, the current source-level API can be used like this:
 
 ```ts
-import { comparePayloads } from "./dist/index.js";
+import { comparePayloads, formatComparisonReport } from "./dist/index.js";
 
 const previousPayload = {
   id: 482,
@@ -80,10 +80,15 @@ const currentPayload = {
 };
 
 const report = comparePayloads(previousPayload, currentPayload);
+
+// Readable output for people:
+console.log(formatComparisonReport(report));
+
+// Structured output for code, tests, and integrations:
 console.log(report.changes);
 ```
 
-Each change has a kind, a JSON Pointer path, and type metadata. Before/after values are omitted by default and can be enabled with `{ includeValues: true }`. Arrays are compared by index; PayloadWatch does not infer insertions, moves, or object identity. Runtime input validation is a separate implementation step.
+Each change has a kind, a JSON Pointer path, and type metadata. Before/after values are omitted by default and can be enabled with `{ includeValues: true }`. Use `formatComparisonReport(report)` for a concise, deterministic text summary; its values remain hidden unless the formatter is also given `{ includeValues: true }`. Arrays are compared by index; PayloadWatch does not infer insertions, moves, or object identity. Runtime input validation is a separate implementation step.
 
 ## Who is it for?
 
@@ -132,7 +137,7 @@ The GitHub Issues track the project from the first design decisions through test
 The proposed first-release boundaries and testable acceptance criteria live in [the MVP scope document](docs/mvp-scope.md). That document is the working agreement for v0.1; implementation details are finalized through the linked design issues.
 
 The input contract and public API direction are documented in [JSON Input Contract and Public API Proposal](docs/json-input-contract.md). The recursive `JsonValue` types and synchronous `comparePayloads` function are implemented; index-based array comparison and runtime validation remain separate issues.
-The change record types, JSON Pointer path rules, ordering, and opt-in value exposure are described in [Change Model and Path Format](docs/change-model.md). The index-by-index array policy is documented in [Array Comparison Policy](docs/array-comparison.md). The v0.1 decision to defer impact classification is documented in [Impact Classification Policy](docs/impact-classification-policy.md).
+The change record types, JSON Pointer path rules, ordering, and opt-in value exposure are described in [Change Model and Path Format](docs/change-model.md). The index-by-index array policy is documented in [Array Comparison Policy](docs/array-comparison.md). The v0.1 decision to defer impact classification is documented in [Impact Classification Policy](docs/impact-classification-policy.md). The readable summary and data-exposure safeguards are described in [Report Format](docs/report-format.md).
 
 ### Phase 1 — Scope and design
 
@@ -225,10 +230,12 @@ src/
   json-value.ts        # Recursive JSON input types
   change-model.ts      # Structured change/report types
   compare.ts           # Recursive object, array, and primitive comparison engine
+  report-format.ts     # Human-readable report formatter
 tests/
   tooling.test.ts      # Initial test-runner smoke test
   compare.test.ts      # Comparison-engine behavior tests
   regression.test.ts   # Focused JSON edge-case regression suite
+  report-format.test.ts # Readable report formatting tests
 tsconfig.json          # Strict TypeScript compiler settings
 vitest.config.ts       # Node.js test configuration
 ```
