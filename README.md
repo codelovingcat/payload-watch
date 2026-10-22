@@ -160,6 +160,8 @@ The change record types, JSON Pointer path rules, ordering, and opt-in value exp
 
 - [#8 — Produce readable summaries and stable structured reports](https://github.com/codelovingcat/payload-watch/issues/8)
 - [#9 — Cover edge cases with a focused regression test suite](https://github.com/codelovingcat/payload-watch/issues/9)
+
+The core comparison regression cases and their expected behavior are tracked in [Regression Test Matrix](docs/regression-test-matrix.md). Run the automated suite from the repository root with `npm test`.
 - [#18 — Create realistic third-party API drift fixtures](https://github.com/codelovingcat/payload-watch/issues/18)
 - [#19 — Define safe handling of payload values in reports and errors](https://github.com/codelovingcat/payload-watch/issues/19)
 - [#20 — Measure behavior on large and deeply nested payloads](https://github.com/codelovingcat/payload-watch/issues/20)
@@ -233,6 +235,7 @@ tests/
   tooling.test.ts      # Initial test-runner smoke test
   compare.test.ts      # Comparison-engine behavior tests
   report-format.test.ts # Readable report formatting tests
+  regression.test.ts   # Focused JSON edge-case regression suite
 tsconfig.json          # Strict TypeScript compiler settings
 vitest.config.ts       # Node.js test configuration
 ```
