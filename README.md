@@ -64,14 +64,14 @@ The core comparison and regression coverage are implemented. Runtime validation 
 
 PayloadWatch currently exposes a source-built ESM API. From a clean checkout, install the development dependencies and build the library:
 
-\`\`\`bash
+```bash
 npm install
 npm run build
-\`\`\`
+```
 
-Create \`example.mjs\` in the repository root and run it with \`node example.mjs\`:
+Create `example.mjs` in the repository root and run it with `node example.mjs`:
 
-\`\`\`js
+```js
 import { comparePayloads, formatComparisonReport } from "./dist/index.js";
 
 // Sample snapshots from a fictional third-party customer API.
@@ -92,31 +92,31 @@ const report = comparePayloads(previousPayload, currentPayload);
 
 console.log(formatComparisonReport(report));
 console.log(report.changes);
-\`\`\`
+```
 
 The readable summary is:
 
-\`\`\`text
+```text
 3 changes detected:
 1. Added value at /customer/fullName (current type: string)
 2. Removed value at /customer/name (previous type: string)
 3. Type changed at /id (number → string)
-\`\`\`
+```
 
-\`comparePayloads\` returns the structured report; \`formatComparisonReport\` turns it into text. Both functions operate on the values passed to them—they do not fetch third-party data, log it automatically, or transmit it anywhere.
+`comparePayloads` returns the structured report; `formatComparisonReport` turns it into text. Both functions operate on the values passed to them—they do not fetch third-party data, log it automatically, or transmit it anywhere.
 
 ## Supported inputs and comparison rules
 
-The public input type is \`JsonValue\`: a JSON object, array, string, finite number, boolean, or \`null\`. Pass parsed data values, not a string containing serialized JSON. Runtime validation for unsupported JavaScript values is not implemented yet (see [Issue #13](https://github.com/codelovingcat/payload-watch/issues/13)), so callers must supply valid JSON data rather than rely on the library to reject every invalid runtime value.
+The public input type is `JsonValue`: a JSON object, array, string, finite number, boolean, or `null`. Pass parsed data values, not a string containing serialized JSON. Runtime validation for unsupported JavaScript values is not implemented yet (see [Issue #13](https://github.com/codelovingcat/payload-watch/issues/13)), so callers must supply valid JSON data rather than rely on the library to reject every invalid runtime value.
 
 PayloadWatch reports four change kinds:
 
-- \`added\`: a property or array element exists only in the current value.
-- \`removed\`: a property or array element exists only in the previous value.
-- \`value-changed\`: a primitive value changed but kept its JSON type.
-- \`type-changed\`: the JSON type changed at that location.
+- `added`: a property or array element exists only in the current value.
+- `removed`: a property or array element exists only in the previous value.
+- `value-changed`: a primitive value changed but kept its JSON type.
+- `type-changed`: the JSON type changed at that location.
 
-Paths use JSON Pointer (RFC 6901): the empty string \`""\` denotes the root, \`~\` is escaped as \`~0\`, and \`/\` within a property key is escaped as \`~1\`. Arrays are compared by index; the library does not infer moves or match objects by identity. Before/after values are omitted by default. For readable output, values require an opt-in on both \`comparePayloads\` and \`formatComparisonReport\`.
+Paths use JSON Pointer (RFC 6901): the empty string `""` denotes the root, `~` is escaped as `~0`, and `/` within a property key is escaped as `~1`. Arrays are compared by index; the library does not infer moves or match objects by identity. Before/after values are omitted by default. For readable output, values require an opt-in on both `comparePayloads` and `formatComparisonReport`.
 
 The v0.1 release reports structural observations only. It does not label changes as breaking or non-breaking; see [Impact Classification Policy](docs/impact-classification-policy.md). For the detailed contract, see [JSON Input Contract](docs/json-input-contract.md), [Change Model and Path Format](docs/change-model.md), and [Array Comparison Policy](docs/array-comparison.md).
 
