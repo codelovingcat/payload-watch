@@ -6,7 +6,10 @@ describe("comparePayloads regression cases", () => {
   it("treats empty objects and nested empty JSON containers as equal", () => {
     expect(comparePayloads({}, {})).toEqual({ changes: [] });
     expect(comparePayloads({ emptyObject: {}, emptyArray: [] }, { emptyArray: [], emptyObject: {} })).toEqual({ changes: [] });
-    expect(comparePayloads([{}, [], null], [null, [], {}])).not.toEqual({ changes: [] });
+    expect(comparePayloads([{}, [], null], [null, [], {}]).changes).toEqual([
+      { kind: "type-changed", path: "/0", previousType: "object", currentType: "null" },
+      { kind: "type-changed", path: "/2", previousType: "null", currentType: "object" },
+    ]);
   });
 
   it("supports all JSON root value kinds without coercion", () => {
@@ -62,7 +65,7 @@ describe("comparePayloads regression cases", () => {
     ["items[0]", "/items[0]"],
     ['say"hello', '/say"hello'],
     ["", "/"],
-  ])("preserves JSON Pointer segments for unusual key %j", (key, expectedPath) => {
+  ] as const)("preserves JSON Pointer segments for unusual key %j", (key: string, expectedPath: string) => {
     const previous = { [key]: "before" };
     const current = { [key]: "after" };
 
