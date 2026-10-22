@@ -234,8 +234,8 @@ src/
 tests/
   tooling.test.ts      # Initial test-runner smoke test
   compare.test.ts      # Comparison-engine behavior tests
-  report-format.test.ts # Readable report formatting tests
   regression.test.ts   # Focused JSON edge-case regression suite
+  report-format.test.ts # Readable report formatting tests
 tsconfig.json          # Strict TypeScript compiler settings
 vitest.config.ts       # Node.js test configuration
 ```
