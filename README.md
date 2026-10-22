@@ -49,46 +49,76 @@ PayloadWatch aims to make these differences explicit, with paths and useful cont
 
 The first version will focus on a small, well-defined job: **compare two JSON-compatible payloads and return a clear, structured description of their differences.**
 
-The planned MVP will explore:
+The current implementation compares two supplied JSON-compatible values and reports:
 
-- **Added fields** — properties present in the new payload but not the baseline.
-- **Removed fields** — properties present in the baseline but missing from the new payload.
-- **Changed values** — properties whose values differ.
+- **Added fields or array elements** — values present only in the current payload.
+- **Removed fields or array elements** — values present only in the previous payload.
+- **Changed primitive values** — values that differ while keeping the same JSON type.
 - **Type changes** — for example, `number → string` or `object → null`.
-- **Nested differences** — changes inside deeply nested objects.
-- **Array behavior** — explicit rules for comparing arrays so the results are predictable.
-- **Readable reports** — a concise summary that points developers to the exact JSON path.
-- **Structured results** — a result format suitable for tests, logs, CI checks, and other tools.
+- **Nested differences** — precise locations within objects and arrays.
+- **Readable summaries and structured reports** — text for people and typed records for code.
 
-The public input and change-report contracts are defined. Implementation and tests are being added incrementally, and PayloadWatch will avoid silently treating observed differences as definite breaking changes.
+The core comparison and regression coverage are implemented. Runtime validation for unsupported JavaScript values, package exports and declarations, and release checks remain separate work. PayloadWatch reports observed structural differences rather than asserting universal breaking impact.
 
-## A basic example
+## Quick start
 
-After building the project locally, the current source-level API can be used like this:
+PayloadWatch currently exposes a source-built ESM API. From a clean checkout, install the development dependencies and build the library:
 
-```ts
+\`\`\`bash
+npm install
+npm run build
+\`\`\`
+
+Create \`example.mjs\` in the repository root and run it with \`node example.mjs\`:
+
+\`\`\`js
 import { comparePayloads, formatComparisonReport } from "./dist/index.js";
 
+// Sample snapshots from a fictional third-party customer API.
+// No live API request is made by PayloadWatch.
 const previousPayload = {
   id: 482,
+  status: "ready",
   customer: { name: "Deniz" },
 };
 
 const currentPayload = {
   id: "482",
+  status: "ready",
   customer: { fullName: "Deniz" },
 };
 
 const report = comparePayloads(previousPayload, currentPayload);
 
-// Readable output for people:
 console.log(formatComparisonReport(report));
-
-// Structured output for code, tests, and integrations:
 console.log(report.changes);
-```
+\`\`\`
 
-Each change has a kind, a JSON Pointer path, and type metadata. Before/after values are omitted by default and can be enabled with `{ includeValues: true }`. Use `formatComparisonReport(report)` for a concise, deterministic text summary; its values remain hidden unless the formatter is also given `{ includeValues: true }`. Arrays are compared by index; PayloadWatch does not infer insertions, moves, or object identity. Runtime input validation is a separate implementation step.
+The readable summary is:
+
+\`\`\`text
+3 changes detected:
+1. Added value at /customer/fullName (current type: string)
+2. Removed value at /customer/name (previous type: string)
+3. Type changed at /id (number → string)
+\`\`\`
+
+\`comparePayloads\` returns the structured report; \`formatComparisonReport\` turns it into text. Both functions operate on the values passed to them—they do not fetch third-party data, log it automatically, or transmit it anywhere.
+
+## Supported inputs and comparison rules
+
+The public input type is \`JsonValue\`: a JSON object, array, string, finite number, boolean, or \`null\`. Pass parsed data values, not a string containing serialized JSON. Runtime validation for unsupported JavaScript values is not implemented yet (see [Issue #13](https://github.com/codelovingcat/payload-watch/issues/13)), so callers must supply valid JSON data rather than rely on the library to reject every invalid runtime value.
+
+PayloadWatch reports four change kinds:
+
+- \`added\`: a property or array element exists only in the current value.
+- \`removed\`: a property or array element exists only in the previous value.
+- \`value-changed\`: a primitive value changed but kept its JSON type.
+- \`type-changed\`: the JSON type changed at that location.
+
+Paths use JSON Pointer (RFC 6901): the empty string \`""\` denotes the root, \`~\` is escaped as \`~0\`, and \`/\` within a property key is escaped as \`~1\`. Arrays are compared by index; the library does not infer moves or match objects by identity. Before/after values are omitted by default. For readable output, values require an opt-in on both \`comparePayloads\` and \`formatComparisonReport\`.
+
+The v0.1 release reports structural observations only. It does not label changes as breaking or non-breaking; see [Impact Classification Policy](docs/impact-classification-policy.md). For the detailed contract, see [JSON Input Contract](docs/json-input-contract.md), [Change Model and Path Format](docs/change-model.md), and [Array Comparison Policy](docs/array-comparison.md).
 
 ## Who is it for?
 
@@ -136,7 +166,7 @@ The GitHub Issues track the project from the first design decisions through test
 
 The proposed first-release boundaries and testable acceptance criteria live in [the MVP scope document](docs/mvp-scope.md). That document is the working agreement for v0.1; implementation details are finalized through the linked design issues.
 
-The input contract and public API direction are documented in [JSON Input Contract and Public API Proposal](docs/json-input-contract.md). The recursive `JsonValue` types and synchronous `comparePayloads` function are implemented; index-based array comparison and runtime validation remain separate issues.
+The input contract and public API direction are documented in [JSON Input Contract and Public API Proposal](docs/json-input-contract.md). The recursive `JsonValue` types and synchronous `comparePayloads` function are implemented, and arrays are compared deterministically by index. Runtime input validation remains tracked in Issue #13.
 The change record types, JSON Pointer path rules, ordering, and opt-in value exposure are described in [Change Model and Path Format](docs/change-model.md). The index-by-index array policy is documented in [Array Comparison Policy](docs/array-comparison.md). The v0.1 decision to defer impact classification is documented in [Impact Classification Policy](docs/impact-classification-policy.md). The readable summary and data-exposure safeguards are described in [Report Format](docs/report-format.md).
 
 ### Phase 1 — Scope and design
@@ -162,6 +192,8 @@ The change record types, JSON Pointer path rules, ordering, and opt-in value exp
 - [#9 — Cover edge cases with a focused regression test suite](https://github.com/codelovingcat/payload-watch/issues/9)
 
 The core comparison regression cases and their expected behavior are tracked in [Regression Test Matrix](docs/regression-test-matrix.md). Run the automated suite from the repository root with `npm test`.
+
+The end-to-end local workflow and remaining package-release checks are documented in [Development Workflow](docs/development-workflow.md) and [Release Readiness](docs/release-readiness.md).
 - [#18 — Create realistic third-party API drift fixtures](https://github.com/codelovingcat/payload-watch/issues/18)
 - [#19 — Define safe handling of payload values in reports and errors](https://github.com/codelovingcat/payload-watch/issues/19)
 - [#20 — Measure behavior on large and deeply nested payloads](https://github.com/codelovingcat/payload-watch/issues/20)
@@ -198,7 +230,7 @@ The initial development toolchain is configured as follows:
 - **Vite 8** — installed explicitly because Vitest 5 uses Vite as a peer dependency.
 - **npm** — installs development dependencies and runs project scripts.
 
-The tools are declared using compatible major-version ranges in `package.json`. A lockfile should be generated once dependencies can be installed from the npm registry. The package is marked private for now so it cannot be accidentally published before the public API, license, package metadata, and release checklist have been reviewed.
+The tools are declared using compatible version ranges in `package.json`. This repository does not yet commit a `package-lock.json`, so `npm install` can resolve different compatible versions at different times; do not use `npm ci` until a reviewed lockfile is committed. The package remains private and explicitly whitelists `dist/`, `README.md`, and `docs/` for packing. This is not a release-ready package yet: exports and declaration files, a license, a lockfile, and a clean consumer-project check remain outstanding.
 
 ### Prerequisites
 
@@ -247,7 +279,7 @@ The toolchain, recursive `JsonValue` types, structured change model, and `compar
 
 This is an actively designed learning project. The goal is to build a useful tool while making the reasoning behind each design choice visible.
 
-At this stage, there is no stable public API and the library is not published to npm. Please follow the GitHub Issues for the agreed scope and implementation progress.
+The comparison and report-formatting functions are implemented, but the npm package entry points and TypeScript declaration output are not finalized. The package is not published to npm and remains marked `private`; release-readiness work is tracked in [Release Readiness](docs/release-readiness.md). Please follow the GitHub Issues for the agreed scope and implementation progress.
 
 ---
 
