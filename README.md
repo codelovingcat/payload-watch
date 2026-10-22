@@ -118,7 +118,7 @@ PayloadWatch reports four change kinds:
 
 Paths use JSON Pointer (RFC 6901): the empty string `""` denotes the root, `~` is escaped as `~0`, and `/` within a property key is escaped as `~1`. Arrays are compared by index; the library does not infer moves or match objects by identity. Before/after values are omitted by default. For readable output, values require an opt-in on both `comparePayloads` and `formatComparisonReport`.
 
-The v0.1 release reports structural observations only. It does not label changes as breaking or non-breaking; see [Impact Classification Policy](docs/impact-classification-policy.md). For the detailed contract, see [JSON Input Contract](docs/json-input-contract.md), [Change Model and Path Format](docs/change-model.md), and [Array Comparison Policy](docs/array-comparison.md).
+The v0.1 release reports structural observations only. It does not label changes as breaking or non-breaking; see [Impact Classification Policy](docs/impact-classification-policy.md). Equality, missing-versus-null behavior, and type transitions are defined in [Comparison Semantics](docs/comparison-semantics.md). For the detailed contract, see [JSON Input Contract](docs/json-input-contract.md), [Change Model and Path Format](docs/change-model.md), and [Array Comparison Policy](docs/array-comparison.md).
 
 ## Who is it for?
 
@@ -267,6 +267,7 @@ tests/
   tooling.test.ts      # Initial test-runner smoke test
   compare.test.ts      # Comparison-engine behavior tests
   regression.test.ts   # Focused JSON edge-case regression suite
+  comparison-semantics.test.ts # Explicit equality and null semantics tests
   report-format.test.ts # Readable report formatting tests
 tsconfig.json          # Strict TypeScript compiler settings
 vitest.config.ts       # Node.js test configuration
