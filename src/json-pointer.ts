@@ -6,6 +6,6 @@
  * remain unchanged. Keep this helper internal to the comparison engine.
  */
 export function appendPointerSegment(parentPath: string, segment: string): string {
-  const escapedSegment = segment.replace(/~/g, "~0").replace(/\\//g, "~1");
-  return `${parentPath}/${escapedSegment}`;
+  const escapedSegment = segment.replace(/~/g, "~0").split("/").join("~1");
+  return parentPath + "/" + escapedSegment;
 }
