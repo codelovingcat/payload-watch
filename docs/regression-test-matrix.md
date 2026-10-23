@@ -26,6 +26,7 @@ The test suite uses Vitest and in-memory values only. It does not call third-par
 | JSON Pointer | `tests/json-pointer.test.ts` directly covers RFC 6901 escaping, root pointers, dotted versus nested keys, spaces, numeric-looking keys, brackets, quotes, empty keys, slashes, and tildes. The regression suite retains broader path edge cases. |
 | Determinism | Repeated comparisons must serialize to the same report. |
 | Side effects and data exposure | Inputs remain unchanged; values remain omitted by default. |
+| Explicit semantic rules | `tests/comparison-semantics.test.ts` verifies no coercion, missing versus `null`, object/array transitions, nested paths, and JSON text versus parsed values. |
 
 ## Invalid JavaScript inputs
 

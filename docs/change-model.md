@@ -3,7 +3,7 @@
 **Status:** Approved design; core implementation is in progress  
 **Tracking issue:** [#4 — Design the change model and JSON path format](https://github.com/codelovingcat/payload-watch/issues/4)
 
-This document defines the shape of a detected change. The comparison engine implements recursive object, primitive, and index-based array differences. Runtime input validation is tracked separately.
+This document defines the shape of a detected change. The comparison engine implements recursive object, primitive, and index-based array differences. Equality, missing-versus-null behavior, and object/array type transitions are specified in [Comparison Semantics](comparison-semantics.md). Runtime input validation is tracked separately.
 
 ## 1. Design goals
 
@@ -28,7 +28,7 @@ PayloadWatch uses a discriminated union with four change kinds:
 
 The JSON types used in the report are `object`, `array`, `string`, `number`, `boolean`, and `null`. A missing property is not a JSON type and is represented by an `added` or `removed` change instead.
 
-Objects and arrays with the same outer type are intended to be compared recursively. A primitive value change with a stable type is `value-changed`. If a node's JSON type changes, PayloadWatch reports one `type-changed` record at that node instead of also reporting every child that is no longer comparable.
+Objects and arrays with the same outer type are compared recursively. A primitive value change with a stable type is `value-changed`; no implicit string/number or boolean/number coercion is applied. If a node's JSON type changes, PayloadWatch reports one `type-changed` record at that node instead of also reporting every child that is no longer comparable. See [Comparison Semantics](comparison-semantics.md) for examples and their dedicated tests.
 
 A change kind is descriptive; it is not a severity or a guarantee of consumer impact.
 
