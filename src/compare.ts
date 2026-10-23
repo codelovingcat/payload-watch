@@ -9,6 +9,7 @@ import type {
   ValueChangedChange,
 } from "./change-model.js";
 import type { JsonArray, JsonObject, JsonPrimitive, JsonValue } from "./json-value.js";
+import { appendPointerSegment } from "./json-pointer.js";
 
 function getJsonValueType(value: JsonValue): JsonValueType {
   if (value === null) {
@@ -38,11 +39,6 @@ function getJsonValueType(value: JsonValue): JsonValueType {
   // The public type prevents this branch for valid TypeScript callers.
   // Runtime rejection of unsupported JavaScript values is handled separately.
   return "object";
-}
-
-function appendPointerSegment(parentPath: string, key: string): string {
-  const escapedKey = key.replace(/~/g, "~0").replace(/\//g, "~1");
-  return parentPath + "/" + escapedKey;
 }
 
 function hasOwn(object: JsonObject, key: string): boolean {
