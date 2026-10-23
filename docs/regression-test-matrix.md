@@ -17,13 +17,13 @@ The test suite uses Vitest and in-memory values only. It does not call third-par
 
 | Area | Regression guarantees |
 | --- | --- |
-| Equal values | Empty objects, empty arrays, nested empty containers, and each JSON root value kind are covered. Dedicated rules also test primitive equality and property-order-independent object equality. |
+| Equal values | Empty objects, nested empty containers, and each JSON root value kind are covered. |
 | Primitive semantics | Strings are not coerced to numbers; booleans remain distinct from numbers. |
 | Change kinds | Additions, removals, same-type value changes, and type changes have asserted output shapes. |
 | Null and absence | Missing properties and explicit `null` are tested in both directions. |
 | Nested structures | Nested objects, arrays, and object/array transitions retain precise paths. |
 | Arrays | Length differences, changes at shared indexes, nested values, and stable index order are covered. |
-| JSON Pointer | Dotted versus nested keys, spaces, numeric-looking keys, brackets, quotes, empty keys, slashes, and tildes are covered. |
+| JSON Pointer | `tests/json-pointer.test.ts` directly covers RFC 6901 escaping, root pointers, dotted versus nested keys, spaces, numeric-looking keys, brackets, quotes, empty keys, slashes, and tildes. The regression suite retains broader path edge cases. |
 | Determinism | Repeated comparisons must serialize to the same report. |
 | Side effects and data exposure | Inputs remain unchanged; values remain omitted by default. |
 | Explicit semantic rules | `tests/comparison-semantics.test.ts` verifies no coercion, missing versus `null`, object/array transitions, nested paths, and JSON text versus parsed values. |
