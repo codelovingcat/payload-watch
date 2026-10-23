@@ -23,7 +23,7 @@ The test suite uses Vitest and in-memory values only. It does not call third-par
 | Null and absence | Missing properties and explicit `null` are tested in both directions. |
 | Nested structures | Nested objects, arrays, and object/array transitions retain precise paths. |
 | Arrays | Length differences, changes at shared indexes, nested values, and stable index order are covered. |
-| JSON Pointer | Dotted versus nested keys, spaces, numeric-looking keys, brackets, quotes, empty keys, slashes, and tildes are covered. |
+| JSON Pointer | `tests/json-pointer.test.ts` directly covers RFC 6901 escaping, root pointers, dotted versus nested keys, spaces, numeric-looking keys, brackets, quotes, empty keys, slashes, and tildes. The regression suite retains broader path edge cases. |
 | Determinism | Repeated comparisons must serialize to the same report. |
 | Side effects and data exposure | Inputs remain unchanged; values remain omitted by default. |
 
