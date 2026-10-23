@@ -55,7 +55,7 @@ The core implementation is in `src/compare.ts`. Array semantics are documented i
 
 ## 4. Why JSON Pointer?
 
-PayloadWatch will use **JSON Pointer (RFC 6901)** rather than an informal dotted path such as `$.customer.name`.
+PayloadWatch uses **JSON Pointer (RFC 6901)** rather than an informal dotted path such as `$.customer.name`.
 
 Dotted paths become ambiguous if a property itself contains a dot. JSON Pointer provides a small escaping rule, is easy to serialize, and clearly represents array indexes.
 
@@ -72,7 +72,7 @@ Examples:
 | Empty-string property name | `/` |
 | Property key `hello world` | `/hello world` |
 
-Within a property name, escape `~` as `~0` and escape `/` as `~1`, in that order. Dots and spaces are not special in JSON Pointer.
+Within a property name, escape `~` as `~0` and escape `/` as `~1`, in that order. Dots, spaces, brackets, quotes, and backslashes are not special in JSON Pointer. The implementation is centralized in `src/json-pointer.ts`; the complete rule table and unusual-key examples are in [JSON Pointer Path Rules](json-pointer-paths.md).
 
 For example, these are different locations:
 
