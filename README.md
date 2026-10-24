@@ -8,7 +8,7 @@ It is designed for developers who integrate with external services—such as com
 
 > “The API used to work. What changed in the response?”
 
-> **Project status:** Early implementation. The synchronous `comparePayloads` API compares nested objects, arrays by index, and primitive values. Runtime input validation remains tracked separately. The package is not published, and the API may continue to evolve.
+> **Project status:** Early implementation. The synchronous `comparePayloads` API compares nested objects, arrays by index, and primitive values. Runtime input validation rejects unsupported JavaScript values with a typed, path-aware `InvalidJsonInputError`. The package is not published, and the API may continue to evolve.
 
 ## Why PayloadWatch?
 
@@ -58,7 +58,7 @@ The current implementation compares two supplied JSON-compatible values and repo
 - **Nested differences** — precise locations within objects and arrays.
 - **Readable summaries and structured reports** — text for people and typed records for code.
 
-The core comparison and regression coverage are implemented. Runtime validation for unsupported JavaScript values, package exports and declarations, and release checks remain separate work. PayloadWatch reports observed structural differences rather than asserting universal breaking impact.
+The core comparison and regression coverage are implemented, including runtime validation for unsupported JavaScript values. Package exports and declarations, and release checks remain separate work. PayloadWatch reports observed structural differences rather than asserting universal breaking impact.
 
 ## Quick start
 
@@ -107,7 +107,7 @@ The readable summary is:
 
 ## Supported inputs and comparison rules
 
-The public input type is `JsonValue`: a JSON object, array, string, finite number, boolean, or `null`. Pass parsed data values, not a string containing serialized JSON. Runtime validation for unsupported JavaScript values is not implemented yet (see [Issue #13](https://github.com/codelovingcat/payload-watch/issues/13)), so callers must supply valid JSON data rather than rely on the library to reject every invalid runtime value.
+The public input type is `JsonValue`: a JSON object, array, string, finite number, boolean, or `null`. Pass parsed data values, not a string containing serialized JSON. Runtime validation rejects unsupported JavaScript values before comparison and throws `InvalidJsonInputError` with the input name, a JSON Pointer path, and a concise reason. The error never serializes the full payload; see [Issue #13](https://github.com/codelovingcat/payload-watch/issues/13) and the [JSON Input Contract](docs/json-input-contract.md).
 
 PayloadWatch reports four change kinds:
 
@@ -166,7 +166,7 @@ The GitHub Issues track the project from the first design decisions through test
 
 The proposed first-release boundaries and testable acceptance criteria live in [the MVP scope document](docs/mvp-scope.md). That document is the working agreement for v0.1; implementation details are finalized through the linked design issues.
 
-The input contract and public API direction are documented in [JSON Input Contract and Public API Proposal](docs/json-input-contract.md). The recursive `JsonValue` types and synchronous `comparePayloads` function are implemented, and arrays are compared deterministically by index. Runtime input validation remains tracked in Issue #13.
+The input contract and public API direction are documented in [JSON Input Contract and Public API Proposal](docs/json-input-contract.md). The recursive `JsonValue` types and synchronous `comparePayloads` function are implemented, and arrays are compared deterministically by index. Runtime input validation is implemented under Issue #13 and documented in the JSON Input Contract.
 The change record types, JSON Pointer path rules, ordering, and opt-in value exposure are described in [Change Model and Path Format](docs/change-model.md). The index-by-index array policy is documented in [Array Comparison Policy](docs/array-comparison.md). The v0.1 decision to defer impact classification is documented in [Impact Classification Policy](docs/impact-classification-policy.md). The readable summary and data-exposure safeguards are described in [Report Format](docs/report-format.md).
 
 ### Phase 1 — Scope and design
@@ -260,6 +260,7 @@ npm run test:watch
 src/
   index.ts             # Public API and type exports
   json-value.ts        # Recursive JSON input types
+  json-input-validation.ts # Runtime JSON contract validation and typed errors
   change-model.ts      # Structured change/report types
   compare.ts           # Recursive object, array, and primitive comparison engine
   json-pointer.ts      # Internal RFC 6901 path segment builder
@@ -270,12 +271,13 @@ tests/
   json-pointer.test.ts # Focused JSON Pointer path tests
   regression.test.ts   # Focused JSON edge-case regression suite
   comparison-semantics.test.ts # Explicit equality and null semantics tests
+  json-input-validation.test.ts # Runtime input validation and error tests
   report-format.test.ts # Readable report formatting tests
 tsconfig.json          # Strict TypeScript compiler settings
 vitest.config.ts       # Node.js test configuration
 ```
 
-The toolchain, recursive `JsonValue` types, structured change model, and `comparePayloads` implementation are in place. The engine handles nested objects and arrays, primitive changes, additions/removals, type changes, deterministic traversal, and opt-in before/after values. Runtime validation is tracked in Issue #13. Package exports and published declaration files will be verified separately before release.
+The toolchain, recursive `JsonValue` types, structured change model, `comparePayloads` implementation, and runtime input validation are in place. The engine handles nested objects and arrays, primitive changes, additions/removals, type changes, deterministic traversal, and opt-in before/after values. Package exports and published declaration files will be verified separately before release.
 
 
 ## Contributing and project status

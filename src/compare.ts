@@ -10,6 +10,7 @@ import type {
 } from "./change-model.js";
 import type { JsonArray, JsonObject, JsonPrimitive, JsonValue } from "./json-value.js";
 import { appendPointerSegment } from "./json-pointer.js";
+import { assertJsonValue } from "./json-input-validation.js";
 
 function getJsonValueType(value: JsonValue): JsonValueType {
   if (value === null) {
@@ -36,8 +37,7 @@ function getJsonValueType(value: JsonValue): JsonValueType {
     return "boolean";
   }
 
-  // The public type prevents this branch for valid TypeScript callers.
-  // Runtime rejection of unsupported JavaScript values is handled separately.
+  // Runtime validation rejects unsupported JavaScript values before comparison.
   return "object";
 }
 
@@ -223,6 +223,9 @@ export function comparePayloads(
   currentPayload: JsonValue,
   options: CompareOptions = {},
 ): ComparisonReport {
+  assertJsonValue(previousPayload, "previousPayload");
+  assertJsonValue(currentPayload, "currentPayload");
+
   const changes: PayloadChange[] = [];
   const includeValues = options.includeValues === true;
 

@@ -27,10 +27,11 @@ The test suite uses Vitest and in-memory values only. It does not call third-par
 | Determinism | Repeated comparisons must serialize to the same report. |
 | Side effects and data exposure | Inputs remain unchanged; values remain omitted by default. |
 | Explicit semantic rules | `tests/comparison-semantics.test.ts` verifies no coercion, missing versus `null`, object/array transitions, nested paths, and JSON text versus parsed values. |
+| Runtime input validation | `tests/json-input-validation.test.ts` covers unsupported primitives, non-finite numbers, invalid object prototypes, sparse arrays, cycles, accessors, symbol/non-enumerable properties, JSON Pointer error paths, and privacy-safe messages. |
 
 ## Invalid JavaScript inputs
 
-Unsupported values such as `undefined`, non-finite numbers, sparse arrays, accessors, and circular references are part of the documented input-validation contract but are not asserted here until the runtime validator is implemented in [Issue #13](https://github.com/codelovingcat/payload-watch/issues/13). They must not be treated as supported inputs merely because the current TypeScript types can be bypassed at runtime.
+Unsupported values such as `undefined`, non-finite numbers, sparse arrays, accessors, and circular references are rejected by the runtime validator. Their focused assertions live in `tests/json-input-validation.test.ts`, tracked by [Issue #13](https://github.com/codelovingcat/payload-watch/issues/13). They must not be treated as supported inputs merely because the TypeScript types can be bypassed at runtime.
 
 ## Scope
 
