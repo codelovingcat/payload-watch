@@ -3,7 +3,7 @@
 **Status:** Approved design; core implementation is in progress  
 **Tracking issue:** [#4 — Design the change model and JSON path format](https://github.com/codelovingcat/payload-watch/issues/4)
 
-This document defines the shape of a detected change. The comparison engine implements recursive object, primitive, and index-based array differences. Equality, missing-versus-null behavior, and object/array type transitions are specified in [Comparison Semantics](comparison-semantics.md). Runtime input validation is tracked separately.
+This document defines the shape of a detected change. The comparison engine implements recursive object, primitive, and index-based array differences. Equality, missing-versus-null behavior, and object/array type transitions are specified in [Comparison Semantics](comparison-semantics.md). Runtime input validation and the `InvalidJsonInputError` contract are implemented and documented in [JSON Input Contract](json-input-contract.md).
 
 ## 1. Design goals
 
@@ -51,7 +51,7 @@ Each record has:
 - `previousType` and/or `currentType`: the observed type information appropriate to that change kind;
 - optional `values`: before/after data, present only when the caller explicitly opts in.
 
-The core implementation is in `src/compare.ts`. Array semantics are documented in [Array Comparison Policy](array-comparison.md). Runtime rejection of unsupported JavaScript values is tracked in Issue #13.
+The core implementation is in `src/compare.ts`. Array semantics are documented in [Array Comparison Policy](array-comparison.md). Runtime rejection of unsupported JavaScript values is enforced by the validator in `src/json-input-validation.ts` and tracked in Issue #13.
 
 ## 4. Why JSON Pointer?
 
@@ -165,4 +165,4 @@ This snippet demonstrates type narrowing against the exported union.
 - [x] The model distinguishes observed changes from impact classification.
 - [x] Core object and primitive runtime diff behavior is implemented and covered by focused tests.
 - [x] Same-type arrays are compared recursively by numeric index, with additions/removals for indexes present on one side only.
-- [ ] Runtime input validation is completed in Issue #13.
+- [x] Runtime input validation and typed, path-aware errors are implemented and covered by focused tests in Issue #13.

@@ -15,7 +15,7 @@ Primitive values are compared without implicit conversion:
 - Numbers are compared as numbers. A number is not equal to a string containing the same digits: `42` and `"42"` produce a `type-changed` report.
 - Booleans are distinct from numbers: `true` and `1` are different JSON types.
 - `null` is equal to `null`, but not to an absent property, an object, or any other value.
-- JSON does not have `undefined`, `NaN`, or infinities as values accepted by this contract. Runtime validation for unsupported JavaScript values is tracked separately in [Issue #13](https://github.com/codelovingcat/payload-watch/issues/13).
+- JSON does not have `undefined`, `NaN`, or infinities as values accepted by this contract. Unsupported JavaScript values are rejected by the runtime validator documented in [JSON Input Contract](json-input-contract.md) and implemented under [Issue #13](https://github.com/codelovingcat/payload-watch/issues/13).
 
 PayloadWatch compares values that the caller supplies. It does not parse a string as JSON automatically. For example, the string `"{\"id\":1}"` is a JSON string; it is not automatically treated as the object `{ id: 1 }`.
 
@@ -60,4 +60,4 @@ For example, changing `{ payload: { id: 1 } }` to `{ payload: [{ id: 1 }] }` pro
 | Nested value | `{ customer: { active: true } }` vs `{ customer: { active: false } }` | `value-changed` at `/customer/active` | `reports a nested primitive change at its JSON Pointer path` |
 | JSON text vs value | `"{\"id\":1}"` vs `{ id: 1 }` | Root `type-changed` | `does not parse JSON text implicitly` |
 
-The executable examples are in `tests/comparison-semantics.test.ts`. Unsupported JavaScript inputs are intentionally excluded from this suite until the runtime validator is implemented.
+The executable examples are in `tests/comparison-semantics.test.ts`. Unsupported JavaScript inputs are covered separately in `tests/json-input-validation.test.ts`.

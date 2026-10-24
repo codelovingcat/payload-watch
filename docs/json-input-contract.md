@@ -1,6 +1,6 @@
 # JSON Input Contract and Public API Proposal
 
-**Status:** Approved input contract; runtime validation is pending  
+**Status:** Implemented input contract with runtime validation and focused tests  
 **Tracking issue:** [#3 — Define the JSON input contract and public comparison API](https://github.com/codelovingcat/payload-watch/issues/3)
 
 This document defines what the first public comparison API is intended to accept. It is a design agreement for review; it does not claim that the comparison function or runtime validator has been implemented.
@@ -39,7 +39,7 @@ These types are exported from the package entry point as type-only exports. They
 
 PayloadWatch accepts JSON data, not arbitrary JavaScript object graphs. Runtime input validation is expected to reject unsupported values instead of silently coercing them or generating a misleading comparison.
 
-The planned rejection policy is:
+The enforced rejection policy is:
 
 - `undefined`, `bigint`, symbols, and functions.
 - Non-finite numbers: `NaN`, `Infinity`, and `-Infinity`.
@@ -50,7 +50,7 @@ The planned rejection policy is:
 
 Plain records with either `Object.prototype` or a `null` prototype can represent JSON objects, provided their own properties meet the rules above. Arrays must be dense and contain only their indexed elements.
 
-Invalid input should throw a `TypeError` with a helpful message and, when practical, the path to the offending value. Error messages must not dump the entire payload, since payloads can contain sensitive data. The detailed error types, formatting, and validation implementation are tracked in [Issue #13 — Validate inputs and report actionable errors](https://github.com/codelovingcat/payload-watch/issues/13).
+Invalid input throws `InvalidJsonInputError`, a `TypeError` subclass exported from the package entry point. It exposes the input name (`previousPayload` or `currentPayload`), the offending `path` as a JSON Pointer (the empty string identifies the root), and a concise `reason`. The message does not serialize the offending value or the payload. Validation inspects property descriptors rather than reading accessor properties, so rejected getters are not executed. The implementation and tests are tracked in [Issue #13 — Validate inputs and report actionable errors](https://github.com/codelovingcat/payload-watch/issues/13).
 
 ## 4. Missing fields and null
 
@@ -82,7 +82,7 @@ const currentPayload: unknown = JSON.parse(currentJsonText);
 const report = comparePayloads(previousPayload, currentPayload);
 ```
 
-The `comparePayloads` function and `ComparisonReport` type are implemented. This example remains conceptual until runtime input validation is added in Issue #13; callers must currently narrow parsed values to `JsonValue` before passing them to the function.
+The `comparePayloads` function and `ComparisonReport` type are implemented, and runtime validation runs before either payload is compared. Callers may cast parsed values to `JsonValue` to satisfy the compile-time API, but runtime validation remains authoritative. An out-of-range JSON number (for example, `1e400`) can become a non-finite JavaScript number and is rejected; the validator also protects calls from unsafe casts and arbitrary JavaScript objects.
 
 PayloadWatch will not parse JSON strings implicitly. A string supplied directly as a value is compared as a JSON string, not treated as serialized JSON.
 
@@ -112,7 +112,7 @@ The change result interfaces, JSON Pointer paths, change-kind literals, and `inc
 - [x] The public comparison function's proposed name, parameters, and synchronous behavior are documented.
 - [x] Non-JSON JavaScript inputs and invalid-input handling policy are documented.
 - [x] Missing properties and explicit `null` are distinguished.
-- [ ] Runtime validation and actionable error behavior are implemented and tested in the dedicated implementation issue.
+- [x] Runtime validation and actionable error behavior are implemented and covered by focused tests in Issue #13.
 - [x] The structured report type and public comparison function are implemented based on the agreed change model.
 
 The checkboxes intentionally distinguish design work from implementation work. Completing this issue defines the contract; later issues implement and verify runtime behavior.
