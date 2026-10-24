@@ -1,0 +1,27 @@
+{
+  "orderId": 7401,
+  "status": "ready",
+  "customer": {
+    "name": "Alex Morgan",
+    "email": "alex@example.invalid"
+  },
+  "items": [
+    {
+      "sku": "BOOK-1",
+      "quantity": 1,
+      "unitPrice": 12.5
+    },
+    {
+      "sku": "PEN-2",
+      "quantity": 2,
+      "unitPrice": 2
+    }
+  ],
+  "shipping": {
+    "method": "standard",
+    "address": {
+      "city": "Istanbul",
+      "postalCode": "34000"
+    }
+  }
+}
