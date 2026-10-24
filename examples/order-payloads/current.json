@@ -1,0 +1,32 @@
+{
+  "orderId": "7401",
+  "status": "ready",
+  "customer": {
+    "fullName": "Alex Morgan",
+    "email": "alex@example.invalid"
+  },
+  "items": [
+    {
+      "sku": "BOOK-1",
+      "quantity": 2,
+      "unitPrice": 12.5
+    },
+    {
+      "sku": "PEN-2",
+      "quantity": 2,
+      "unitPrice": 2
+    },
+    {
+      "sku": "MUG-3",
+      "quantity": 1,
+      "unitPrice": 8.75
+    }
+  ],
+  "shipping": {
+    "method": "express",
+    "address": {
+      "city": "Ankara",
+      "postalCode": "34000"
+    }
+  }
+}

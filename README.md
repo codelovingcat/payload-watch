@@ -105,6 +105,24 @@ The readable summary is:
 
 `comparePayloads` returns the structured report; `formatComparisonReport` turns it into text. Both functions operate on the values passed to them—they do not fetch third-party data, log it automatically, or transmit it anywhere.
 
+## Realistic example: order API drift
+
+The [synthetic order fixtures](examples/order-payloads/) show a common API update. Across the two snapshots, the order ID changes from a number to a string, `customer.name` is replaced by `customer.fullName`, an item quantity and shipping details change, and a new item appears. All names, IDs, addresses, and prices are fictional; the email uses the reserved `.invalid` domain, and no live API is called.
+
+Run `npm test` to see the fixture-based end-to-end assertions in `tests/order-drift.test.ts`. The expected report contains these seven paths:
+
+```text
+/customer/fullName
+/customer/name
+/items/0/quantity
+/items/2
+/orderId
+/shipping/address/city
+/shipping/method
+```
+
+The [unchanged fixture](examples/order-payloads/unchanged.json) is also tested to ensure an equivalent pair returns `No changes detected.`.
+
 ## Supported inputs and comparison rules
 
 The public input type is `JsonValue`: a JSON object, array, string, finite number, boolean, or `null`. Pass parsed data values, not a string containing serialized JSON. Runtime validation rejects unsupported JavaScript values before comparison and throws `InvalidJsonInputError` with the input name, a JSON Pointer path, and a concise reason. The error never serializes the full payload; see [Issue #13](https://github.com/codelovingcat/payload-watch/issues/13) and the [JSON Input Contract](docs/json-input-contract.md).
