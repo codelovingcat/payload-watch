@@ -45,6 +45,40 @@ function hasOwn(object: JsonObject, key: string): boolean {
   return Object.prototype.hasOwnProperty.call(object, key);
 }
 
+/**
+ * Copy a validated JSON subtree so opt-in report values do not share mutable
+ * object or array references with the input payload.
+ */
+function cloneJsonValue(value: JsonValue): JsonValue {
+  if (value === null || typeof value !== "object") {
+    return value;
+  }
+
+  if (Array.isArray(value)) {
+    const clone: JsonValue[] = [];
+    for (let index = 0; index < value.length; index += 1) {
+      clone.push(cloneJsonValue(value[index]!));
+    }
+    return clone;
+  }
+
+  const prototype = Object.getPrototypeOf(value) as object | null;
+  const clone = Object.create(
+    prototype === null ? null : Object.prototype,
+  ) as Record<string, JsonValue>;
+
+  for (const key of Object.keys(value)) {
+    Object.defineProperty(clone, key, {
+      value: cloneJsonValue(value[key]!),
+      enumerable: true,
+      configurable: true,
+      writable: true,
+    });
+  }
+
+  return clone as JsonObject;
+}
+
 function createAddedChange(
   path: string,
   currentValue: JsonValue,
@@ -54,7 +88,7 @@ function createAddedChange(
     kind: "added",
     path,
     currentType: getJsonValueType(currentValue),
-    ...(includeValues ? { values: { current: currentValue } } : {}),
+    ...(includeValues ? { values: { current: cloneJsonValue(currentValue) } } : {}),
   };
 }
 
@@ -67,7 +101,7 @@ function createRemovedChange(
     kind: "removed",
     path,
     previousType: getJsonValueType(previousValue),
-    ...(includeValues ? { values: { previous: previousValue } } : {}),
+    ...(includeValues ? { values: { previous: cloneJsonValue(previousValue) } } : {}),
   };
 }
 
@@ -88,7 +122,12 @@ function compareNode(
       previousType,
       currentType,
       ...(includeValues
-        ? { values: { previous: previousValue, current: currentValue } }
+        ? {
+            values: {
+              previous: cloneJsonValue(previousValue),
+              current: cloneJsonValue(currentValue),
+            },
+          }
         : {}),
     };
     changes.push(change);
@@ -212,7 +251,8 @@ function compareArrays(
  *
  * Object keys are visited in ascending JavaScript string sort order. Paths use
  * RFC 6901 JSON Pointer escaping. Before/after values are omitted unless
- * includeValues is explicitly set to true.
+ * includeValues is explicitly set to true. Included object/array values are
+ * detached snapshots, so mutating a report value cannot mutate either input.
  *
  * Arrays are ordered sequences and are compared by numeric index. The engine
  * does not infer moves or match array objects by identity. A transition between

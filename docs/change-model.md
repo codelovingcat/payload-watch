@@ -93,11 +93,11 @@ comparePayloads(previousPayload, currentPayload, {
 });
 ```
 
-When `includeValues` is enabled, the report can include the value or values associated with the changed location under `values`. For example, an added field includes `values.current`; a removed field includes `values.previous`; a change to an existing value includes both.
+When `includeValues` is enabled, the report includes a snapshot of the value or values associated with the changed location under `values`. For example, an added field includes `values.current`; a removed field includes `values.previous`; a type change includes both. Object and array values are recursively copied, so these snapshots do not share mutable nested references with the input payloads. Mutating a report snapshot therefore cannot mutate either input. Primitive values are copied by value.
 
 This is an opt-in behavior because external API responses may contain personal data, tokens, or business-sensitive values. PayloadWatch will not automatically log, upload, or transmit payload contents. A caller who enables value inclusion remains responsible for handling the resulting report safely.
 
-The `PayloadChange` types model the possible before/after shapes. The `includeValues` option is implemented by `comparePayloads`; callers remain responsible for safely handling any values they explicitly request.
+The `PayloadChange` types model the possible before/after shapes. The `includeValues` option is implemented by `comparePayloads`. Returned report objects are not frozen, so callers may edit their snapshots, but these edits do not affect the original inputs. Callers remain responsible for safely handling explicitly requested values.
 
 ## 6. Deterministic ordering
 
@@ -160,7 +160,7 @@ This snippet demonstrates type narrowing against the exported union.
 - [x] Structured change records cover additions, removals, value changes, and type changes.
 - [x] Type metadata and paths are described.
 - [x] Paths use a reversible standard format for dots, slashes, tildes, spaces, and empty keys.
-- [x] Value exposure is opt-in and the default is documented.
+- [x] Value exposure is opt-in, with detached nested snapshots and the default documented.
 - [x] Ordering is defined without locale-dependent sorting.
 - [x] The model distinguishes observed changes from impact classification.
 - [x] Core object and primitive runtime diff behavior is implemented and covered by focused tests.

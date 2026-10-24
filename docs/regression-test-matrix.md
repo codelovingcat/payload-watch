@@ -25,7 +25,8 @@ The test suite uses Vitest and in-memory values only. It does not call third-par
 | Arrays | Length differences, changes at shared indexes, nested values, and stable index order are covered. |
 | JSON Pointer | `tests/json-pointer.test.ts` directly covers RFC 6901 escaping, root pointers, dotted versus nested keys, spaces, numeric-looking keys, brackets, quotes, empty keys, slashes, and tildes. The regression suite retains broader path edge cases. |
 | Determinism | Repeated comparisons must serialize to the same report. |
-| Side effects and data exposure | Inputs remain unchanged; values remain omitted by default. |
+| Side effects and data exposure | Inputs remain unchanged; values remain omitted by default. With `includeValues: true`, report snapshots are detached from source objects and arrays. |
+| Stable repeated results | Repeated comparisons of unchanged input pairs produce identical serialized reports, including opt-in snapshots. |
 | Explicit semantic rules | `tests/comparison-semantics.test.ts` verifies no coercion, missing versus `null`, object/array transitions, nested paths, and JSON text versus parsed values. |
 | Runtime input validation | `tests/json-input-validation.test.ts` covers unsupported primitives, non-finite numbers, invalid object prototypes, sparse arrays, cycles, accessors, symbol/non-enumerable properties, JSON Pointer error paths, and privacy-safe messages. |
 
