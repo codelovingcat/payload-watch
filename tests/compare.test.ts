@@ -200,6 +200,71 @@ describe("comparePayloads", () => {
     expect(current).toEqual(currentSnapshot);
   });
 
+  it("returns detached before/after snapshots for added, removed, and type-changed containers", () => {
+    const previous = {
+      obsolete: { nested: { status: "old", list: [1, 2] } },
+      typeChanged: { enabled: true },
+    };
+    const current = {
+      created: [{ id: 7, tags: ["safe"] }],
+      typeChanged: [1, { id: 2 }],
+    };
+    const previousSnapshot = structuredClone(previous);
+    const currentSnapshot = structuredClone(current);
+
+    const report = comparePayloads(previous, current, { includeValues: true });
+    const expectedReport = JSON.stringify(
+      comparePayloads(previous, current, { includeValues: true }),
+    );
+
+    const added = report.changes.find(
+      (change) => change.kind === "added" && change.path === "/created",
+    );
+    const removed = report.changes.find(
+      (change) => change.kind === "removed" && change.path === "/obsolete",
+    );
+    const typeChanged = report.changes.find(
+      (change) => change.kind === "type-changed" && change.path === "/typeChanged",
+    );
+
+    expect(added?.kind).toBe("added");
+    expect(removed?.kind).toBe("removed");
+    expect(typeChanged?.kind).toBe("type-changed");
+    if (
+      added?.kind !== "added" ||
+      removed?.kind !== "removed" ||
+      typeChanged?.kind !== "type-changed"
+    ) {
+      throw new Error("Expected added, removed, and type-changed report entries");
+    }
+
+    const addedValue = added.values?.current as unknown as { id: number; tags: string[] }[];
+    const removedValue = removed.values?.previous as unknown as {
+      nested: { status: string; list: number[] };
+    };
+    const previousTypeValue = typeChanged.values?.previous as unknown as { enabled: boolean };
+    const currentTypeValue = typeChanged.values?.current as unknown as (number | { id: number })[];
+
+    expect(addedValue).not.toBe(current.created);
+    expect(addedValue[0]).not.toBe(current.created[0]);
+    expect(removedValue).not.toBe(previous.obsolete);
+    expect(removedValue.nested).not.toBe(previous.obsolete.nested);
+    expect(currentTypeValue).not.toBe(current.typeChanged);
+    expect(previousTypeValue).not.toBe(previous.typeChanged);
+
+    // Mutating report snapshots must not mutate either caller-owned payload.
+    addedValue[0]!.tags.push("report-only");
+    removedValue.nested.status = "report-only";
+    removedValue.nested.list.push(99);
+    previousTypeValue.enabled = false;
+    currentTypeValue.push(99);
+
+    expect(previous).toEqual(previousSnapshot);
+    expect(current).toEqual(currentSnapshot);
+    expect(JSON.stringify(comparePayloads(previous, current, { includeValues: true })))
+      .toBe(expectedReport);
+  });
+
   it("returns no changes for equal empty and populated arrays", () => {
     expect(comparePayloads([], [])).toEqual({ changes: [] });
     expect(comparePayloads([1, "two", null], [1, "two", null])).toEqual({ changes: [] });
