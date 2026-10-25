@@ -54,7 +54,7 @@ function cloneJsonValue(value: JsonValue): JsonValue {
     return value;
   }
 
-  if (Array.isArray(value)) {
+  if (isJsonArray(value)) {
     const clone: JsonValue[] = [];
     for (let index = 0; index < value.length; index += 1) {
       clone.push(cloneJsonValue(value[index]!));
@@ -77,6 +77,10 @@ function cloneJsonValue(value: JsonValue): JsonValue {
   }
 
   return clone as JsonObject;
+}
+
+function isJsonArray(value: JsonValue): value is JsonArray {
+  return Array.isArray(value);
 }
 
 function createAddedChange(
