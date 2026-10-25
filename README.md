@@ -62,10 +62,10 @@ The core comparison and regression coverage are implemented, including runtime v
 
 ## Quick start
 
-PayloadWatch currently exposes a source-built ESM API. From a clean checkout, install the development dependencies and build the library:
+PayloadWatch currently exposes a source-built ESM API. From a clean checkout, install the exact development dependency versions recorded in the committed lockfile and build the library:
 
 ```bash
-npm install
+npm ci
 npm run build
 ```
 
@@ -248,7 +248,7 @@ The initial development toolchain is configured as follows:
 - **Vite 8** — installed explicitly because Vitest 5 uses Vite as a peer dependency.
 - **npm** — installs development dependencies and runs project scripts.
 
-The tools are declared using compatible version ranges in `package.json`. This repository does not yet commit a `package-lock.json`, so `npm install` can resolve different compatible versions at different times; do not use `npm ci` until a reviewed lockfile is committed. The package remains private and explicitly whitelists `dist/`, `README.md`, and `docs/` for packing. This is not a release-ready package yet: exports and declaration files, a license, a lockfile, and a clean consumer-project check remain outstanding.
+The tools are declared using compatible version ranges in `package.json`; the committed version-3 `package-lock.json` pins the resolved dependency tree. Use `npm ci` for a reproducible install from a fresh checkout. The package remains private and explicitly whitelists `dist/`, `README.md`, and `docs/` for packing. This is not a release-ready package yet: exports and declaration files, a license, and a clean consumer-project check remain outstanding.
 
 ### Prerequisites
 
@@ -290,7 +290,10 @@ tests/
   regression.test.ts   # Focused JSON edge-case regression suite
   comparison-semantics.test.ts # Explicit equality and null semantics tests
   json-input-validation.test.ts # Runtime input validation and error tests
+  order-drift.test.ts  # Synthetic API drift fixture tests
   report-format.test.ts # Readable report formatting tests
+examples/
+  order-payloads/        # Synthetic baseline, current, and unchanged JSON snapshots
 tsconfig.json          # Strict TypeScript compiler settings
 vitest.config.ts       # Node.js test configuration
 ```

@@ -1,6 +1,6 @@
 # PayloadWatch Release Readiness
 
-This checklist records the release-related gaps found while reviewing the current repository metadata for Issue #10. It is deliberately not a claim that the package is ready to publish.
+This checklist records release-related gaps after the Issue #10 verification pass. Build, type-check, tests, and a package dry-run were reported successful in PR #44; the repository does not yet have a CI run for that verification, and the checklist is deliberately not a claim that the package is ready to publish.
 
 ## Metadata reviewed
 
@@ -13,7 +13,7 @@ This checklist records the release-related gaps found while reviewing the curren
 | `engines.node` | `>=22.12.0` | Node.js 22.12.0 or newer is required. |
 | `files` | `dist/`, `README.md`, `docs/` | The package has an explicit allowlist for runtime output and documentation. |
 | `main` / `exports` / `types` | Not yet defined | A consumer-facing package entry point and declaration-file contract remain for Issue #22. |
-| `package-lock.json` | Not committed | Dependency versions are not yet pinned in a tracked lockfile. |
+| `package-lock.json` | Committed, lockfile version 3 | The resolved dependency tree is tracked; use `npm ci` for a clean, reproducible install. |
 | License | Not present | License selection remains for Issue #23. |
 
 ## Expected package contents
@@ -27,10 +27,10 @@ The `files` allowlist should pack only:
 
 The source tree, tests, TypeScript/Vitest configuration, and development dependencies should not be included. The manifest has been configured for this intended file set, but a successful dry-run is the evidence required to confirm npm's actual output.
 
-Run these commands from a fresh checkout after installing dependencies:
+Run these commands from a fresh checkout:
 
 ```bash
-npm install
+npm ci
 npm run build
 npm run typecheck
 npm test
@@ -41,11 +41,12 @@ Inspect the JSON `files` list from the last command. If it contains anything out
 
 ## Remaining release-readiness checklist
 
-- [ ] Generate and review a tracked `package-lock.json`; then verify a clean `npm ci` install.
-- [ ] Run build, type-check, and the full test suite from a clean checkout.
-- [ ] Run `npm pack --dry-run --json` and inspect the actual packed file list.
+- [x] Commit the reviewed `package-lock.json` (version 3) so dependency resolution is pinned.
+- [ ] Verify `npm ci` from a fresh checkout.
+- [x] Run `npm run build`, `npm run typecheck`, and `npm test` (83 tests) in the local validation reported by PR #44; repeat from a fresh checkout after `npm ci` before release.
+- [x] Run `npm pack --dry-run --json`; PR #44 reports 27 files limited to `package.json`, `README.md`, `docs/`, and `dist/`.
 - [ ] Define package exports and generate TypeScript declarations (Issue #22).
-- [ ] Implement and test runtime input validation (Issue #13).
+- [x] Implement and test runtime input validation (Issue #13).
 - [ ] Choose a license and document contribution expectations (Issue #23).
 - [ ] Install the packed tarball in a clean consumer project and test runtime imports and TypeScript types (Issue #25).
 - [ ] Decide versioning and changelog policy (Issue #26).

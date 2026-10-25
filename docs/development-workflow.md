@@ -10,12 +10,14 @@ This guide covers the current local development path for PayloadWatch v0.1. It d
 
 ## From a checkout to a working build
 
-Clone the repository and enter its directory. The repository does not currently commit a `package-lock.json`, so use `npm install` rather than `npm ci` until a reviewed lockfile is added.
+The repository's tracked lockfile keeps dependency resolution reproducible. If `npm ci` fails because the lockfile and manifest disagree, stop and reconcile those files instead of silently switching to `npm install`.
+
+Clone the repository and enter its directory. The repository commits a version-3 `package-lock.json`; use `npm ci` to install the pinned dependency tree from a fresh checkout.
 
 ```bash
 git clone https://github.com/codelovingcat/payload-watch.git
 cd payload-watch
-npm install
+npm ci
 npm run build
 npm run typecheck
 npm test
@@ -58,7 +60,7 @@ node example.mjs
 
 The report records the new `/customer/fullName` property, the removed `/customer/name` property, and the type change at `/id`. Paths are JSON Pointers. Array elements are compared by index; the library does not infer moves or match elements by identity.
 
-The current input type is `JsonValue`. Only JSON-compatible data should be supplied. Runtime validation for unsupported JavaScript values is not implemented yet (Issue #13), so callers should not assume invalid inputs will always be rejected with a helpful error. Before/after values are omitted by default because API payloads can be sensitive. Showing values in text output requires opting in both when comparing and when formatting.
+The current input type is `JsonValue`. Only JSON-compatible data should be supplied. Runtime validation rejects unsupported JavaScript values with an `InvalidJsonInputError` that identifies the input and JSON Pointer path without serializing payload values (Issue #13). Before/after values are omitted by default because API payloads can be sensitive. Showing values in text output requires opting in both when comparing and when formatting.
 
 ## Inspect the package without publishing
 
@@ -72,7 +74,6 @@ This is a local package inspection; it does not publish to npm. The package allo
 
 ## What this workflow does not cover
 
-- Runtime rejection and actionable errors for non-JSON JavaScript input (Issue #13).
 - CI build, type-check, and test automation (Issue #21).
 - Final package exports and declaration-file generation (Issue #22).
 - License and contribution terms (Issue #23).
