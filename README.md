@@ -125,7 +125,7 @@ The [unchanged fixture](examples/order-payloads/unchanged.json) is also tested t
 
 ## Supported inputs and comparison rules
 
-The public input type is `JsonValue`: a JSON object, array, string, finite number, boolean, or `null`. Pass parsed data values, not a string containing serialized JSON. Runtime validation rejects unsupported JavaScript values before comparison and throws `InvalidJsonInputError` with the input name, a JSON Pointer path, and a concise reason. The error never serializes the full payload; see [Issue #13](https://github.com/codelovingcat/payload-watch/issues/13) and the [JSON Input Contract](docs/json-input-contract.md).
+The public input type is `JsonValue`: a JSON object, array, string, finite number, boolean, or `null`. Pass parsed data values, not a string containing serialized JSON. Runtime validation rejects unsupported JavaScript values before comparison and throws `InvalidJsonInputError` with the input name, a JSON Pointer path, and a concise reason. The error never serializes payload values; see [Issue #13](https://github.com/codelovingcat/payload-watch/issues/13) and the [JSON Input Contract](docs/json-input-contract.md).
 
 PayloadWatch reports four change kinds:
 
@@ -135,6 +135,10 @@ PayloadWatch reports four change kinds:
 - `type-changed`: the JSON type changed at that location.
 
 Paths use JSON Pointer (RFC 6901): the empty string `""` denotes the root, `~` is escaped as `~0`, and `/` within a property key is escaped as `~1`. Arrays are compared by index; the library does not infer moves or match objects by identity. Before/after values are omitted by default. For readable output, values require an opt-in on both `comparePayloads` and `formatComparisonReport`. When included, object and array values are detached snapshots, so changing a report value does not mutate either input payload.
+
+## Privacy and data handling
+
+PayloadWatch compares the values supplied by the caller; it does not make network requests, log payload values, or write payload data to files. Structured reports omit before/after values by default. Enabling `includeValues` puts detached copies of changed values into the returned report, so treat that report as sensitive. The text formatter also requires its own `includeValues: true` opt-in before showing any values. Validation errors identify the input, JSON Pointer path, and reason without serializing payload values; paths still contain property names, which may themselves be sensitive. See [Privacy and Data Handling](docs/privacy-and-data-handling.md) for guidance.
 
 The v0.1 release reports structural observations only. It does not label changes as breaking or non-breaking; see [Impact Classification Policy](docs/impact-classification-policy.md). Equality, missing-versus-null behavior, and type transitions are documented in [Comparison Semantics](docs/comparison-semantics.md). JSON Pointer construction, including unusual property names, is documented in [JSON Pointer Path Rules](docs/json-pointer-paths.md). For the detailed contract, see [JSON Input Contract](docs/json-input-contract.md), [Change Model and Path Format](docs/change-model.md), and [Array Comparison Policy](docs/array-comparison.md).
 
