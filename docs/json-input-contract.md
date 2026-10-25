@@ -3,7 +3,7 @@
 **Status:** Implemented input contract with runtime validation and focused tests  
 **Tracking issue:** [#3 — Define the JSON input contract and public comparison API](https://github.com/codelovingcat/payload-watch/issues/3)
 
-This document defines what the first public comparison API is intended to accept. It is a design agreement for review; it does not claim that the comparison function or runtime validator has been implemented.
+This document defines the supported inputs for the public comparison API and describes the implemented runtime validator. The examples below are intended to match the code and its regression tests.
 
 ## 1. Proposed public API
 
@@ -37,7 +37,7 @@ These types are exported from the package entry point as type-only exports. They
 
 ## 3. Values that are not valid JSON inputs
 
-PayloadWatch accepts JSON data, not arbitrary JavaScript object graphs. Runtime input validation is expected to reject unsupported values instead of silently coercing them or generating a misleading comparison.
+PayloadWatch accepts JSON data, not arbitrary JavaScript object graphs. Runtime input validation rejects unsupported values instead of silently coercing them or generating a misleading comparison.
 
 The enforced rejection policy is:
 
@@ -103,7 +103,7 @@ This issue proposes and documents:
 - the policy of rejecting unsupported JavaScript-only values rather than coercing them;
 - the distinction between missing object properties and explicit `null`.
 
-The change result interfaces, JSON Pointer paths, change-kind literals, and `includeValues` option are defined in Issue #4 and implemented in `src/change-model.ts` and `src/compare.ts`. Runtime invalid-input handling is tracked separately.
+The change result interfaces, JSON Pointer paths, change-kind literals, and `includeValues` option are defined in Issue #4 and implemented in `src/change-model.ts` and `src/compare.ts`. Runtime invalid-input handling is implemented in `src/json-input-validation.ts`, with `InvalidJsonInputError` exported from the public entry point.
 
 ## 8. Acceptance checklist
 
