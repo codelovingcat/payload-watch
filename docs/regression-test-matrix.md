@@ -31,6 +31,7 @@ The test suite uses Vitest and in-memory values only. It does not call third-par
 | Runtime input validation | `tests/json-input-validation.test.ts` covers unsupported primitives, non-finite numbers, invalid object prototypes, sparse arrays, cycles, accessors, symbol/non-enumerable properties, JSON Pointer error paths, and privacy-safe messages. |
 | Privacy and report exposure | `tests/report-format.test.ts` verifies nested values are hidden unless both APIs opt in; `tests/json-input-validation.test.ts` checks error messages and stacks do not serialize payload values. |
 | Realistic API drift examples | `tests/order-drift.test.ts` uses synthetic order fixtures to assert additions, removals, renamed-looking fields, type changes, nested changes, array changes, unchanged payloads, and deterministic reports. |
+| Large and deeply nested payloads | `tests/large-payload.test.ts` checks 1,000 unchanged records, one change at the end of a large array, 1,000 reported changes, and a leaf change at depth 150. No test uses a wall-clock threshold. |
 
 ## Invalid JavaScript inputs
 
