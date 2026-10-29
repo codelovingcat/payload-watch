@@ -101,6 +101,8 @@ export interface CompareOptions {
    * sensitive information. Enabling this option does not log or transmit data.
    */
   readonly includeValues?: boolean;
+  /** Exact RFC 6901 paths whose entire subtrees are omitted from changes. */
+  readonly ignorePaths?: readonly JsonPointer[];
 }
 
 /** Options for formatting a structured report as readable text. */
