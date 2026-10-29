@@ -48,3 +48,6 @@ jobs:
 
       - name: Run unit and regression tests
         run: npm test
+
+      - name: Verify package exports and consumer types
+        run: npm run check:package
