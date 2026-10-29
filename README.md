@@ -190,6 +190,10 @@ Keeping the first release narrow should let us make the core behavior dependable
 - **Careful with data:** avoid logging full payloads or sensitive values by default; decide how before/after values should be exposed.
 - **Small and focused:** favor a clear core over an oversized feature set.
 
+## Versioning and changes
+
+See [Versioning and Release Policy](docs/versioning-policy.md) and [CHANGELOG](CHANGELOG.md). PayloadWatch is still private at `0.0.0`; no npm release or stable API promise has been made.
+
 ## Development roadmap
 
 The GitHub Issues track the project from the first design decisions through testing and release preparation. The first 10 issues established the main workstreams; additional issues make the important technical and release tasks more explicit.
