@@ -208,6 +208,10 @@ Keeping the first release narrow should let us make the core behavior dependable
 
 See [Versioning and Release Policy](docs/versioning-policy.md) and [CHANGELOG](CHANGELOG.md). PayloadWatch is still private at `0.0.0`; no npm release or stable API promise has been made.
 
+## First npm release readiness
+
+Publication is not automatic. Review the [First Release Checklist](docs/first-release-checklist.md) and use `npm run release:preflight` to report local metadata blockers. The check does **not** publish and is expected to fail until an authorized release configuration is selected.
+
 ## Development roadmap
 
 The GitHub Issues track the project from the first design decisions through testing and release preparation. The first 10 issues established the main workstreams; additional issues make the important technical and release tasks more explicit.

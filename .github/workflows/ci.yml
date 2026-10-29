@@ -60,3 +60,6 @@ jobs:
 
       - name: Check CLI file comparison
         run: npm run test:cli
+
+      - name: Test non-publishing release preflight
+        run: npm run test:release-preflight
