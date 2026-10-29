@@ -1,36 +1,34 @@
-# Optional local JSON file comparison CLI
+# Optional JSON comparison CLI
 
-**Tracking issue:** [#15](https://github.com/codelovingcat/payload-watch/issues/15) (post-MVP developer experience).
+**Issues:** [#15](https://github.com/codelovingcat/payload-watch/issues/15) and [#16](https://github.com/codelovingcat/payload-watch/issues/16). This optional CLI is **post-MVP**; npm publication is gated separately.
 
-## Choice and boundary
-
-The CLI is an **optional executable entry point within the existing npm package**. Its `bin/payload-watch.mjs` source is separate from the core `src/` comparison library. The core remains callable without file I/O, network calls, storage, or invoking the CLI. This extension is **post-MVP**; inclusion in any public npm release requires explicit release-scope review.
-
-Build first, then run:
+After `npm ci && npm run build`:
 
 ```bash
-npm ci
-npm run build
 node bin/payload-watch.mjs compare examples/order-payloads/baseline.json examples/order-payloads/current.json
+node bin/payload-watch.mjs compare --format json --fail-on-change examples/order-payloads/baseline.json examples/order-payloads/current.json
 ```
 
-Once a locally packed archive is installed in a consumer project, its executable name is `payload-watch`:
+The locally installed executable is `payload-watch`:
 
-```bash
-payload-watch compare previous.json current.json
+```text
+payload-watch compare [--format text|json] [--fail-on-change] <previous.json> <current.json>
 ```
 
-Run `payload-watch --help` for usage. The CLI reads the two named **UTF-8 JSON files**, parses them using `JSON.parse`, then calls the same `comparePayloads` function and `formatComparisonReport` as the public library. Passing JSON text as a JS string to the library is not the same as parsing files.
+Options may occur before or after file paths. `--format=json` works as well as `--format json`. `--help` prints usage. Stdin is not supported.
 
-## Behavior and errors
+## Output contracts
 
-- Arguments are positional: `compare <previous.json> <current.json>`. Neither input is modified.
-- Differences print to stdout with one line per change. **Exit 0** means the operation ran, whether or not differences were found; this CLI does not currently fail merely because JSON changed.
-- Missing arguments or unknown commands: usage message on stderr and exit **2**.
-- Unreadable files or invalid JSON text: a concise stderr message and exit **2**. Invalid JSON text is never echoed.
-- Unsupported parsed numbers, including `1e400` (which becomes infinity), can cause `InvalidJsonInputError`; the message reports only input argument, path, and short reason.
-- No automatic HTTP requests, API credentials or extra runtime dependencies. Avoid using production payloads for bug reports or CI logs.
+- **Default `--format text`**: the core `formatComparisonReport` human-readable summary, with a newline.
+- **`--format json`**: exactly `JSON.stringify(comparePayloads(previous, current))` and one newline, with top-level `changes` array and no ANSI codes, headers, timestamps or payload values.
+- **`--fail-on-change`**: switches exit code to `1` if **any** JSON difference exists. This is not a breaking-change verdict.
 
-Focused integration checks use local synthetic fixture files: `npm run test:cli` (after `npm run build`). CI verifies Node.js 22 and 24.
+| Exit code | Meaning |
+| --- | --- |
+| **0** | Valid comparison, regardless of differences unless fail-on-change was requested. |
+| **1** | Valid comparison with differences, and fail-on-change requested. |
+| **2** | Invalid arguments, unreadable files, bad JSON or failed runtime input validation. |
 
-**Next:** [Issue #16](https://github.com/codelovingcat/payload-watch/issues/16) defines machine-readable output and optional fail-on-change exit codes. Those modes are not yet included in this PR.
+All errors go to stderr without echoing JSON input text; successful results go to stdout. Both modes omit values by default; JSON Pointer property names can still reveal sensitive information. The CLI does not make HTTP requests or mutate files.
+
+The CLI is separate from the pure library comparison API. Test with `npm run test:cli` after `npm run build`. CI runs it on Node.js 22 and 24.

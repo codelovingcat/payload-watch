@@ -131,7 +131,7 @@ After `npm ci && npm run build`, compare two JSON files:
 node bin/payload-watch.mjs compare examples/order-payloads/baseline.json examples/order-payloads/current.json
 ```
 
-The bin entry is also named `payload-watch` when this package is installed from a local archive. The CLI is an opt-in file-reading layer; the core library remains synchronous and has no file or network I/O. For now, differences are printed in human-readable form and exit with code `0`; usage/invalid JSON/unreadable-file errors exit with `2`. No sensitive JSON values are printed by default. See [CLI Usage](docs/cli.md).
+The bin entry is also named `payload-watch` when this package is installed from a local archive. The CLI is an opt-in file-reading layer; the core library remains synchronous and has no file or network I/O. The CLI supports text or machine-readable JSON output, plus optional `--fail-on-change` (exit `1` for differences); usage, file and parse errors exit with `2`. No sensitive JSON values are printed by default. See [CLI Usage](docs/cli.md).
 
 ## API reference and runnable examples
 
