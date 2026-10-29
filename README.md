@@ -65,7 +65,7 @@ The core comparison and regression coverage are implemented, including runtime v
 PayloadWatch currently exposes a source-built ESM API. From a clean checkout, install the development dependencies and build the library:
 
 ```bash
-npm install
+npm ci
 npm run build
 ```
 
@@ -123,6 +123,10 @@ Run `npm test` to see the fixture-based end-to-end assertions in `tests/order-dr
 
 The [unchanged fixture](examples/order-payloads/unchanged.json) is also tested to ensure an equivalent pair returns `No changes detected.`.
 
+## Optional ignore paths (post-MVP)
+
+Pass `{ ignorePaths: ["/metadata/requestId"] }` to ignore an exact JSON Pointer path and its descendants. See [Ignore Paths](docs/ignore-paths.md) for escaping, edge cases and risks.
+
 ## Optional local CLI (post-MVP)
 
 After `npm ci && npm run build`, compare two JSON files:
@@ -131,7 +135,7 @@ After `npm ci && npm run build`, compare two JSON files:
 node bin/payload-watch.mjs compare examples/order-payloads/baseline.json examples/order-payloads/current.json
 ```
 
-The bin entry is also named `payload-watch` when this package is installed from a local archive. The CLI is an opt-in file-reading layer; the core library remains synchronous and has no file or network I/O. The CLI supports text or machine-readable JSON output, plus optional `--fail-on-change` (exit `1` for differences); usage, file and parse errors exit with `2`. No sensitive JSON values are printed by default. See [CLI Usage](docs/cli.md).
+The executable is also named `payload-watch` when this package is installed from a local archive. The CLI is an optional file-reading layer; the core library remains synchronous and does not read files or make network calls. The CLI supports text or machine-readable JSON output, plus `--fail-on-change` (exit code `1` on differences); usage, file and parse errors return `2`. See [CLI Usage](docs/cli.md).
 
 ## API reference and runnable examples
 
@@ -200,6 +204,10 @@ Keeping the first release narrow should let us make the core behavior dependable
 - **Careful with data:** avoid logging full payloads or sensitive values by default; decide how before/after values should be exposed.
 - **Small and focused:** favor a clear core over an oversized feature set.
 
+## Versioning and changes
+
+See [Versioning and Release Policy](docs/versioning-policy.md) and [CHANGELOG](CHANGELOG.md). PayloadWatch is still private at `0.0.0`; no npm release or stable API promise has been made.
+
 ## Development roadmap
 
 The GitHub Issues track the project from the first design decisions through testing and release preparation. The first 10 issues established the main workstreams; additional issues make the important technical and release tasks more explicit.
@@ -249,6 +257,8 @@ The end-to-end local workflow and remaining package-release checks are documente
 - [#26 — Define semantic versioning and changelog policy](https://github.com/codelovingcat/payload-watch/issues/26)
 - [#27 — Prepare and publish the first npm release](https://github.com/codelovingcat/payload-watch/issues/27)
 
+The [Post-MVP Review](docs/post-mvp-review.md) records which extensions have concrete evidence, where existing tools overlap, and which ideas remain unvalidated. It does not expand the first-release scope.
+
 ### Phase 5 — Post-MVP developer experience
 
 These are deliberately later additions. The first version should prove that the core comparison behavior is dependable before we expand into a terminal workflow.
@@ -270,7 +280,7 @@ The initial development toolchain is configured as follows:
 - **Vite 8** — installed explicitly because Vitest 5 uses Vite as a peer dependency.
 - **npm** — installs development dependencies and runs project scripts.
 
-The tools are declared using compatible version ranges in `package.json`. This repository does not yet commit a `package-lock.json`, so `npm install` can resolve different compatible versions at different times; do not use `npm ci` until a reviewed lockfile is committed. The package remains private and explicitly whitelists `dist/`, `README.md`, and `docs/` for packing. This is not a release-ready package yet: exports and declaration files, a license, a lockfile, and a clean consumer-project check remain outstanding.
+The repository tracks a version-3 `package-lock.json`, and `npm ci` is used for reproducible installs. ESM package exports, generated declarations and clean archive-consumer tests are implemented and tested by CI on Node.js 22/24. The package remains private at version `0.0.0`; the final license, versioning and publication decisions are separate.
 
 ### Prerequisites
 
@@ -282,7 +292,7 @@ The tools are declared using compatible version ranges in `package.json`. This r
 Clone the repository and enter its directory, then run:
 
 ```bash
-npm install
+npm ci
 npm run build
 npm run typecheck
 npm test
@@ -317,14 +327,14 @@ tsconfig.json          # Strict TypeScript compiler settings
 vitest.config.ts       # Node.js test configuration
 ```
 
-The toolchain, recursive `JsonValue` types, structured change model, `comparePayloads` implementation, and runtime input validation are in place. The engine handles nested objects and arrays, primitive changes, additions/removals, type changes, deterministic traversal, and opt-in before/after values. Package exports and published declaration files will be verified separately before release.
+The toolchain, recursive `JsonValue` types, structured change model, `comparePayloads` implementation, and runtime input validation are in place. The engine handles nested objects and arrays, primitive changes, additions/removals, type changes, deterministic traversal, and opt-in before/after values. The ESM package entry points and generated TypeScript declarations are already verified in the isolated consumer checks. No npm publication has taken place.
 
 
 ## Contributing and project status
 
 PayloadWatch is an actively developed TypeScript-first learning and library project. Discussions and reproducible bug reports are welcome. Read [Contributing](CONTRIBUTING.md) for issue templates, local checks, pull-request expectations, and security-sensitive test data, and the [Code of Conduct](CODE_OF_CONDUCT.md) for collaboration standards.
 
-**Licensing decision pending:** The repository does not yet include a software `LICENSE` file. Its public visibility alone is not an open-source reuse license. The maintainer must explicitly select the intended terms before a license is added or code contributions are accepted. Review the [licensing decision guide](docs/licensing-decision.md) and [Issue #23](https://github.com/codelovingcat/payload-watch/issues/23). Until then, do not describe this repository as MIT, Apache-2.0, GPL, or otherwise licensed for external reuse.
+**License:** PayloadWatch is available under the [MIT License](LICENSE) (Copyright © 2026 codelovingcat). Reuse, modification, and commercial use are permitted under its terms; retain the copyright and license notice. The decision is recorded in [Licensing Decision](docs/licensing-decision.md). We welcome original contributions under the same license; see [Contributing](CONTRIBUTING.md).
 
 The package is not published to npm and remains `private: true`. The current ESM package export, generated TypeScript declarations, and consumer checks are described in [Package Entry Points](docs/package-entrypoints.md); release requirements are tracked in [Release Readiness](docs/release-readiness.md).
 

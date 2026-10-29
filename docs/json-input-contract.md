@@ -3,9 +3,9 @@
 **Status:** Implemented input contract with runtime validation and focused tests  
 **Tracking issue:** [#3 — Define the JSON input contract and public comparison API](https://github.com/codelovingcat/payload-watch/issues/3)
 
-This document defines what the first public comparison API is intended to accept. It is a design agreement for review; it does not claim that the comparison function or runtime validator has been implemented.
+This document describes the implemented public input contract and runtime validator. The behavior is covered by the tests and the package's API reference.
 
-## 1. Proposed public API
+## 1. Public API
 
 The public entry point is proposed to be a synchronous function:
 
