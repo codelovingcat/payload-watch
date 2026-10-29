@@ -21,6 +21,10 @@ First candidate **0.1.0** is prepared, but **has not been published to npm**. Pa
 
 - Escape control characters and ambiguous literal backslashes in human-readable JSON Pointer paths to prevent injected terminal output. Structured report paths and JSON CLI output remain unchanged.
 
+### Changed
+
+- Make CLI test fixtures and missing-file paths portable across operating systems, and add a Windows Node.js 22 CLI smoke job covering text/JSON reports and exit codes.
+
 ### Known limitations
 
 - Pre-1.0 API and output contracts are evolving; Node.js 22.12+ and ESM are required. No CommonJS or browser runtime guarantee.

@@ -6,7 +6,7 @@ The [CI workflow](../.github/workflows/ci.yml) verifies PayloadWatch from a clea
 
 ## Supported Node.js versions in CI
 
-The job matrix uses Ubuntu-hosted runners with **Node.js 22** and **Node.js 24**. The package currently declares `engines.node >=22.12.0`; the matrix samples the two supported major releases rather than every possible patch version. GitHub's `setup-node` action installs the respective available version in each major line.
+The main job matrix uses Ubuntu-hosted runners with **Node.js 22** and **Node.js 24**. A separate **Windows (`windows-latest`, Node.js 22)** smoke job installs the locked dependencies, builds, type-checks, and runs the full CLI integration suite (`npm run test:cli`). The package declares `engines.node >=22.12.0`; these jobs sample supported major versions and one Windows configuration rather than every patch version, filesystem, or platform.
 
 ## What each job checks
 
@@ -21,7 +21,13 @@ npm test
 
 `npm ci` uses the tracked `package-lock.json` and refuses an out-of-sync manifest/lockfile rather than updating dependencies. The build compiles the TypeScript sources, the type-check step validates them without emitting files, and `npm test` runs the Vitest suite, including large-payload correctness tests. Failure of any required command fails that Node.js job and reports it on the PR.
 
-Check the pull request's **Checks** tab or the repository's **Actions** tab for the `CI` workflow and both Node.js jobs. For a workflow error, inspect the first failing step's log, reproduce the same command locally with a compatible Node.js version, and commit a fix to the PR branch. Do not mark this workflow as validated solely because its YAML is present: confirm both jobs pass on a GitHub-hosted runner.
+Check the pull request's **Checks** tab or the repository's **Actions** tab for the `CI` workflow and both Node.js jobs. For a workflow error, inspect the first failing step's log, reproduce the same command locally with a compatible Node.js version, and commit a fix to the PR branch. Do not mark this workflow as validated solely because its YAML is present: confirm both Linux jobs and the Windows CLI smoke job pass on GitHub-hosted runners.
+
+## Windows CLI coverage
+
+The Windows job specifically exercises local JSON-file comparison in text and JSON modes, valid no-change comparisons, exit-code behavior for changes/errors, and temporary file paths containing spaces and non-ASCII characters. CLI integration tests now convert file URLs with Node.js `fileURLToPath()`, not a raw URL `.pathname`, and create unique temporary paths for missing-file cases.
+
+Windows smoke coverage confirms those CLI workflows on a GitHub-hosted Windows runner; it does **not** claim that the full Linux packaging and consumer-installation suite has been exercised on Windows. All temporary fixtures are synthetic and removed in `finally` blocks. Existing Linux Node.js 22/24 jobs remain unchanged.
 
 ## Data, security, and benchmark scope
 
