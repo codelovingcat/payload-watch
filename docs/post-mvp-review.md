@@ -43,4 +43,36 @@ Collect issue links, redacted reproduction cases and concrete acceptance criteri
 
 The v0.1 core remains the benchmark for release readiness. Later optional features being developed in separate PRs do not automatically become mandatory for v0.1 or block the first publication. Release planning should explicitly decide if any optional CLI or ignore functionality is included; a complete build can contain an optional feature while release scope is still awaiting final authorization.
 
-**Review outcome:** Priorities and a reproducible feedback protocol are documented. Real adopter validation is **still pending**; this planning issue should remain open until actual feedback is recorded and reviewed.
+**Review outcome:** Internal scenario review, candidate priorities, trade-offs and the feedback intake protocol are documented and executable. This completes the *planning* deliverable; **external adopter feedback remains uncollected** and must never be represented as validated demand. New feature decisions require real user evidence.
+
+## Reproducible internal scenario review
+
+Run the *actual implemented* library and CLI together after a build:
+
+```bash
+npm ci
+npm run build
+node scripts/verify-post-mvp-scenarios.mjs
+```
+
+The GitHub Actions Node.js 22 and 24 matrix runs the same command. The script uses only the existing fictional order fixtures and small synthetic objects, checks exact change paths, ensures values are omitted by default, and verifies that the CLI exits with 1 only when explicitly asked to fail on observed differences.
+
+| Scenario | Expected observation | Practical conclusion |
+| --- | --- | --- |
+| Fictional order response drift | Seven stable JSON Pointer changes | Core drift diagnostics solve the primary sample debugging task |
+| Insert one object at the front of a two-element array | Three positional findings (`/items/0/sku`, `/items/1/sku`, `/items/2`) | Index-based comparison creates noise when element identity matters; do not infer moves |
+| Change request ID and business status | Two findings by default; one (`/status`) when ignoring `/requestId` | Exact-path ignores reduce specific noise but **can conceal important changes** |
+| CLI machine output with `--fail-on-change` | Same seven paths, no value snapshots, exit 1 | Existing CLI supports scripts without requiring an additional CI Action |
+| Compare a payload with itself | Zero changes | No false drift for unchanged values in this scenario |
+
+**Evidence level:** this is a reproducible **internal engineering evaluation**, not external developer interviews, production telemetry or a performance benchmark. It does not measure time saved in real workflows.
+
+### Adoption feedback workflow
+
+Developers can use the [feedback issue template](../.github/ISSUE_TEMPLATE/developer-feedback.md) after trying the synthetic example or a locally sanitized sample. It asks what genuinely helped, what was misleading, whether arrays have stable identifiers, which exact paths are volatile, whether a CLI is useful, and which competing tool was considered. Never paste actual customer payloads, credentials or private log contents.
+
+A maintained feedback ledger should link *actual* submitted issues and observed reproductions; until such feedback exists, do **not** claim external validation. The planning assessment can be complete while future adopter validation remains an explicit follow-on activity.
+
+### Decision for the first release review
+
+Prioritize **no new post-MVP features** before the first candidate release. The optional CLI and `ignorePaths` are already implemented and included in the current build; label their limitations clearly as evolving pre-1.0 APIs **if approved for the first release**. Excluding either would require a separate reviewed change to the actual package/API, not just a documentation claim. Keep schema-aware impact, identity-aware arrays and monitoring out of this first-release gate absent concrete validated demand.

@@ -63,3 +63,6 @@ jobs:
 
       - name: Test non-publishing release preflight
         run: npm run test:release-preflight
+
+      - name: Replay post-MVP evaluation scenarios
+        run: node scripts/verify-post-mvp-scenarios.mjs
