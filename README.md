@@ -123,6 +123,16 @@ Run `npm test` to see the fixture-based end-to-end assertions in `tests/order-dr
 
 The [unchanged fixture](examples/order-payloads/unchanged.json) is also tested to ensure an equivalent pair returns `No changes detected.`.
 
+## Optional local CLI (post-MVP)
+
+After `npm ci && npm run build`, compare two JSON files:
+
+```bash
+node bin/payload-watch.mjs compare examples/order-payloads/baseline.json examples/order-payloads/current.json
+```
+
+The bin entry is also named `payload-watch` when this package is installed from a local archive. The CLI is an opt-in file-reading layer; the core library remains synchronous and has no file or network I/O. For now, differences are printed in human-readable form and exit with code `0`; usage/invalid JSON/unreadable-file errors exit with `2`. No sensitive JSON values are printed by default. See [CLI Usage](docs/cli.md).
+
 ## API reference and runnable examples
 
 Start with the [Public API Reference](docs/api-reference.md) for every exported function, type, option and error, plus troubleshooting and known limitations. After `npm run build`, run `node examples/api-reference.mjs` for an executable walkthrough using synthetic order API snapshots. The example is also checked by CI.

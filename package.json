@@ -23,7 +23,8 @@
     "test:watch": "vitest",
     "benchmark": "node scripts/benchmark.mjs",
     "check:package": "node scripts/check-package.mjs",
-    "check:consumer": "node scripts/check-clean-consumer.mjs"
+    "check:consumer": "node scripts/check-clean-consumer.mjs",
+    "test:cli": "node --test tests/cli.integration.test.mjs"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
@@ -34,6 +35,10 @@
   "files": [
     "dist/",
     "README.md",
-    "docs/"
-  ]
+    "docs/",
+    "bin/"
+  ],
+  "bin": {
+    "payload-watch": "./bin/payload-watch.mjs"
+  }
 }
