@@ -24,6 +24,7 @@
     "benchmark": "node scripts/benchmark.mjs",
     "check:package": "node scripts/check-package.mjs",
     "check:consumer": "node scripts/check-clean-consumer.mjs",
+    "test:cli": "node --test tests/cli.integration.test.mjs",
     "release:preflight": "node scripts/release-preflight.mjs",
     "test:release-preflight": "node --test tests/release-preflight.test.mjs"
   },
@@ -36,6 +37,11 @@
   "files": [
     "dist/",
     "README.md",
-    "docs/"
-  ]
+    "docs/",
+    "bin/"
+  ],
+  "license": "MIT",
+  "bin": {
+    "payload-watch": "./bin/payload-watch.mjs"
+  }
 }

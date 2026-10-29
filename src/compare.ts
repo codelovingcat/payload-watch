@@ -11,6 +11,7 @@ import type {
 import type { JsonArray, JsonObject, JsonPrimitive, JsonValue } from "./json-value.js";
 import { appendPointerSegment } from "./json-pointer.js";
 import { assertJsonValue } from "./json-input-validation.js";
+import { isIgnored, prepareIgnorePaths } from "./ignore-paths.js";
 
 function getJsonValueType(value: JsonValue): JsonValueType {
   if (value === null) {
@@ -115,7 +116,9 @@ function compareNode(
   path: string,
   includeValues: boolean,
   changes: PayloadChange[],
+  ignores: ReadonlySet<string>,
 ): void {
+  if (isIgnored(path, ignores)) return;
   const previousType = getJsonValueType(previousValue);
   const currentType = getJsonValueType(currentValue);
 
@@ -145,6 +148,7 @@ function compareNode(
       path,
       includeValues,
       changes,
+      ignores,
     );
     return;
   }
@@ -156,6 +160,7 @@ function compareNode(
       path,
       includeValues,
       changes,
+      ignores,
     );
     return;
   }
@@ -186,6 +191,7 @@ function compareObjects(
   path: string,
   includeValues: boolean,
   changes: PayloadChange[],
+  ignores: ReadonlySet<string>,
 ): void {
   const keys = [...new Set([...Object.keys(previousObject), ...Object.keys(currentObject)])];
   keys.sort();
@@ -194,6 +200,7 @@ function compareObjects(
     const previousHasKey = hasOwn(previousObject, key);
     const currentHasKey = hasOwn(currentObject, key);
     const childPath = appendPointerSegment(path, key);
+    if (isIgnored(childPath, ignores)) continue;
 
     if (!previousHasKey) {
       changes.push(createAddedChange(childPath, currentObject[key]!, includeValues));
@@ -211,6 +218,7 @@ function compareObjects(
       childPath,
       includeValues,
       changes,
+      ignores,
     );
   }
 }
@@ -222,11 +230,13 @@ function compareArrays(
   path: string,
   includeValues: boolean,
   changes: PayloadChange[],
+  ignores: ReadonlySet<string>,
 ): void {
   const longestLength = Math.max(previousArray.length, currentArray.length);
 
   for (let index = 0; index < longestLength; index += 1) {
     const childPath = appendPointerSegment(path, String(index));
+    if (isIgnored(childPath, ignores)) continue;
     const previousHasIndex = index < previousArray.length;
     const currentHasIndex = index < currentArray.length;
 
@@ -246,6 +256,7 @@ function compareArrays(
       childPath,
       includeValues,
       changes,
+      ignores,
     );
   }
 }
@@ -272,8 +283,9 @@ export function comparePayloads(
 
   const changes: PayloadChange[] = [];
   const includeValues = options.includeValues === true;
+  const ignores = prepareIgnorePaths(options.ignorePaths);
 
-  compareNode(previousPayload, currentPayload, "", includeValues, changes);
+  compareNode(previousPayload, currentPayload, "", includeValues, changes, ignores);
 
   return { changes };
 }

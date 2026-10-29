@@ -58,5 +58,8 @@ jobs:
       - name: Verify clean consumer installation
         run: npm run check:consumer
 
+      - name: Check CLI file comparison
+        run: npm run test:cli
+
       - name: Test non-publishing release preflight
         run: npm run test:release-preflight

@@ -1,39 +1,25 @@
-# License decision — owner approval required
+# License decision: MIT
 
 **Tracking issue:** [#23 — Choose a license and document contribution expectations](https://github.com/codelovingcat/payload-watch/issues/23)  
-**Status:** **Pending maintainer decision**. This document is a decision record, not a license grant.
+**Decision:** MIT (SPDX identifier `MIT`), authorized by the repository owner on 2026-10-29.
 
-## Current status
+## Decision and scope
 
-PayloadWatch currently has **no software LICENSE file** and no `license` field in `package.json`. Its publicly viewable repository is **not yet licensed for general open-source use or redistribution**. GitHub's platform terms allow activities such as viewing and forking on GitHub but do not substitute for a project-wide open-source license. Do not label the package “MIT licensed” or “Apache licensed” until the copyright holder chooses and adds a license.
+PayloadWatch is intended to be a small, reusable TypeScript/Node.js library that developers can adopt in open-source and commercial projects without reciprocal source-disclosure obligations. The owner authorized selection of an appropriate open-source license; **MIT** was selected for its short and permissive terms and widespread library compatibility.
 
-The owner should decide whether the library is intended for broad permissive adoption, reciprocal sharing, or to stay unlicensed for now.
+The binding terms are in the repository's [LICENSE](../LICENSE), with **Copyright (c) 2026 codelovingcat**. The package manifest declares `"license": "MIT"` for SPDX-aware tooling. MIT requires retaining the copyright and license notice in copies or substantial portions, and includes warranty and liability disclaimers.
 
-## Options to decide between
+MIT does **not** include an express patent grant equivalent to Apache-2.0. The alternatives considered were Apache-2.0, GPL-3.0-only, and remaining unlicensed; those were not chosen. This decision does not claim ownership of third-party code or grant permissions beyond the rights held by the contributors.
 
-| Option | What it means for this library | Practical trade-off |
-| --- | --- | --- |
-| **MIT** | Short, permissive terms; permits commercial and proprietary use with retention of the license and copyright notice. | Simple for adoption; does not contain the same express patent license as Apache-2.0. |
-| **Apache-2.0** | Permissive, including commercial/proprietary use; includes an express contributor patent grant and related conditions. | More detailed notice and change-marking obligations than MIT. |
-| **GPL-3.0-only** | Copyleft terms for redistribution of covered derivative works; source-sharing duties apply when distributing covered works. | Stronger reciprocal requirements; potentially harder for proprietary consumers of a library. |
-| **No license yet** | The copyright holder keeps default rights; viewing a public repository does not grant general reuse or redistribution rights. | Fine for an unpublished experiment, but unclear/unsuitable for a broadly reusable public library. |
+## Contribution and distribution
 
-**Working suggestion (not a decision):** MIT is worth considering if the priority is a small, easy-to-adopt JSON comparison library. Apache-2.0 may be preferable if its explicit patent provisions matter. GPL-3.0-only better fits a deliberate copyleft preference. A public repository does not require selecting any of these.
+- Contributions should be original or legally redistributable under MIT; see [CONTRIBUTING.md](../CONTRIBUTING.md).
+- A lightweight [Code of Conduct](../CODE_OF_CONDUCT.md) applies to project discussions.
+- The local npm archive must contain the correct LICENSE file along with compiled JavaScript and TypeScript declarations. `npm run check:package` enforces the archive contract in CI.
+- The package is still `private: true`, version `0.0.0`, **not published to npm**. The MIT repository license and the npm release decision are separate.
 
-For primary guidance, see [GitHub's licensing documentation](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/licensing-a-repository), [Choose a License](https://choosealicense.com/), and [SPDX license identifiers](https://spdx.org/licenses/). License compatibility and copyright ownership may need additional review when accepting outside code.
+## Verification
 
-## Decision checklist
+From a clean checkout run `npm ci`, `npm run build`, `npm run typecheck`, `npm test`, then `npm run check:package`. Review the CI job results before merging.
 
-- [ ] Maintainer explicitly chooses **MIT**, **Apache-2.0**, **GPL-3.0-only**, or **no license for now**.
-- [ ] If choosing a license: confirm the copyright holder / attribution text and ownership of the code (including any contributions).
-- [ ] Add the **unchanged official license text** at the repository root in `LICENSE` (and applicable notice files only if required).
-- [ ] Record the exact SPDX expression in `package.json`, and add a short accurate license note in `README.md`.
-- [ ] Update the existing `scripts/check-package.mjs` distribution allowlist so the required license file is allowed **and verified as present in the actual package**. Adjust `docs/package-entrypoints.md` and release-readiness documentation accordingly.
-- [ ] Confirm GitHub CI (Node.js 22 and 24) succeeds and verify the license appears in the packed archive.
-- [ ] Only after the explicit decision and corresponding changes are complete, close [Issue #23](https://github.com/codelovingcat/payload-watch/issues/23).
-
-## Code of Conduct and contributions
-
-A lightweight [Code of Conduct](../CODE_OF_CONDUCT.md) sets expectations for respectful technical collaboration. [Contributing](../CONTRIBUTING.md) gives concrete issue, test, and PR guidance. Until the license and contribution terms are decided, incoming code contributions should **not** be merged into the repository. A dedicated private moderation contact can be added if the community grows; this is not needed to decide the software license.
-
-**Decision log:** No selection or grant has been recorded. This PR intentionally does **not** add a `LICENSE` file, edit `package.json` licensing, or claim Issue #23 is closed.
+**Status:** License selection recorded. Issue #23 is resolved when this LICENSE/metadata/packaging PR merges successfully.
