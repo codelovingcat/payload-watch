@@ -123,6 +123,10 @@ Run `npm test` to see the fixture-based end-to-end assertions in `tests/order-dr
 
 The [unchanged fixture](examples/order-payloads/unchanged.json) is also tested to ensure an equivalent pair returns `No changes detected.`.
 
+## API reference and runnable examples
+
+Start with the [Public API Reference](docs/api-reference.md) for every exported function, type, option and error, plus troubleshooting and known limitations. After `npm run build`, run `node examples/api-reference.mjs` for an executable walkthrough using synthetic order API snapshots. The example is also checked by CI.
+
 ## Supported inputs and comparison rules
 
 The public input type is `JsonValue`: a JSON object, array, string, finite number, boolean, or `null`. Pass parsed data values, not a string containing serialized JSON. Runtime validation rejects unsupported JavaScript values before comparison and throws `InvalidJsonInputError` with the input name, a JSON Pointer path, and a concise reason. The error never serializes payload values; see [Issue #13](https://github.com/codelovingcat/payload-watch/issues/13) and the [JSON Input Contract](docs/json-input-contract.md).

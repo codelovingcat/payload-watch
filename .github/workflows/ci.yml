@@ -51,3 +51,6 @@ jobs:
 
       - name: Verify package exports and consumer types
         run: npm run check:package
+
+      - name: Run documented API examples
+        run: node examples/api-reference.mjs
