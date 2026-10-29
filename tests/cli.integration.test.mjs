@@ -55,3 +55,43 @@ describe("file comparison CLI", () => {
     }
   });
 });
+
+describe("CI-friendly CLI output and exit codes", () => {
+  it("writes machine-readable JSON without ANSI or values", () => {
+    const p = run("compare", "--format", "json", baseline.pathname, current.pathname);
+    assert.equal(p.status, 0);
+    assert.equal(p.stderr, "");
+    const data = JSON.parse(p.stdout);
+    assert.equal(data.changes.length, 7);
+    assert.deepEqual(data.changes[0], { kind: "added", path: "/customer/fullName", currentType: "string" });
+    assert.ok(!p.stdout.includes("\u001b"));
+    assert.ok(!p.stdout.includes("Alex Morgan"));
+  });
+  it("supports --format=text and --format=json", () => {
+    const text = run("compare", "--format=text", baseline.pathname, current.pathname);
+    assert.equal(text.status, 0);
+    assert.match(text.stdout, /^7 changes detected:/);
+    const json = run("compare", baseline.pathname, current.pathname, "--format=json");
+    assert.equal(json.status, 0);
+    assert.equal(JSON.parse(json.stdout).changes.length, 7);
+  });
+  it("returns exit 1 only on changes when fail-on-change is enabled", () => {
+    const different = run("compare", "--fail-on-change", baseline.pathname, current.pathname);
+    assert.equal(different.status, 1);
+    assert.match(different.stdout, /^7 changes detected:/);
+    const same = run("compare", "--fail-on-change", "--format=json", baseline.pathname, unchanged.pathname);
+    assert.equal(same.status, 0);
+    assert.deepEqual(JSON.parse(same.stdout), { changes: [] });
+  });
+  it("uses exit 2 and stderr for errors, never stdout", () => {
+    const invalid = run("compare", "--format", "xml", baseline.pathname, current.pathname);
+    assert.equal(invalid.status, 2);
+    assert.equal(invalid.stdout, "");
+    assert.match(invalid.stderr, /--format must be text or json/);
+    const duplicate = run("compare", "--fail-on-change", "--fail-on-change", baseline.pathname, current.pathname);
+    assert.equal(duplicate.status, 2);
+    const missing = run("compare", "--fail-on-change", baseline.pathname, "/this-path-should-not-exist/payload.json");
+    assert.equal(missing.status, 2);
+    assert.equal(missing.stdout, "");
+  });
+});

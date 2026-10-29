@@ -135,7 +135,7 @@ After `npm ci && npm run build`, compare two JSON files:
 node bin/payload-watch.mjs compare examples/order-payloads/baseline.json examples/order-payloads/current.json
 ```
 
-The executable is also named `payload-watch` when this package is installed from a local archive. The CLI is an optional file-reading layer; the core library remains synchronous and does not read files or make network calls. The initial CLI prints a human-readable report and returns exit code `0` for a valid comparison or `2` for usage, file and parse errors. See [CLI Usage](docs/cli.md).
+The executable is also named `payload-watch` when this package is installed from a local archive. The CLI is an optional file-reading layer; the core library remains synchronous and does not read files or make network calls. The CLI supports text or machine-readable JSON output, plus `--fail-on-change` (exit code `1` on differences); usage, file and parse errors return `2`. See [CLI Usage](docs/cli.md).
 
 ## API reference and runnable examples
 
