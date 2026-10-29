@@ -59,9 +59,9 @@ const report = comparePayloads(previous, current, { includeValues: true });
 const summary = formatComparisonReport(report, { includeValues: true });
 ```
 
-The second opt-in helps prevent accidental exposure of API fields containing personal, credential, or business-sensitive data. The formatter returns a string; it does not call `console.log`, transmit data, or write files by itself.
+The second opt-in helps prevent accidental exposure of API fields containing personal, credential, or business-sensitive data. Note that `includeValues: true` on `comparePayloads` means the structured report itself contains the changed values even when the formatter omits them. Treat that report as sensitive. Added/removed container values and type-changed values can include whole nested objects or arrays at the affected location. The formatter returns a string; it does not call `console.log`, transmit data, or write files by itself. See [Privacy and Data Handling](privacy-and-data-handling.md).
 
-When values are explicitly included, objects are rendered as compact JSON with keys sorted recursively. This keeps output stable for equivalent object values, even if their property insertion order differs. Large values can still produce large summaries, so enable this option only when the destination is suitable for the data.
+When values are explicitly included, objects are rendered as compact JSON with keys sorted recursively. This keeps output stable for equivalent object values, even if their property insertion order differs. Large values can still produce large summaries, so enable this option only when the destination is suitable for the data. JSON Pointer paths include property names; keep that in mind when logging reports or errors if your schema uses confidential field names.
 
 ## Change wording
 

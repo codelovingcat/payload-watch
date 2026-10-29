@@ -88,6 +88,41 @@ describe("formatComparisonReport", () => {
     );
   });
 
+  it("keeps nested sensitive values out of text unless both APIs opt in", () => {
+    const previous = {
+      account: {
+        accessToken: "previous-access-token-secret",
+        profile: { privateNote: "previous-private-note-secret" },
+      },
+    };
+    const current = {
+      account: {
+        accessToken: "current-access-token-secret",
+        profile: { privateNote: "current-private-note-secret" },
+      },
+    };
+
+    const reportWithValues = comparePayloads(previous, current, { includeValues: true });
+    const defaultSummary = formatComparisonReport(reportWithValues);
+    const optedInSummary = formatComparisonReport(reportWithValues, { includeValues: true });
+    const reportWithoutValues = comparePayloads(previous, current);
+    const formatterOnlyOptIn = formatComparisonReport(reportWithoutValues, { includeValues: true });
+
+    expect(JSON.stringify(reportWithValues)).toContain("previous-access-token-secret");
+    expect(defaultSummary).not.toContain("previous-access-token-secret");
+    expect(defaultSummary).not.toContain("current-access-token-secret");
+    expect(defaultSummary).not.toContain("previous-private-note-secret");
+    expect(defaultSummary).not.toContain("current-private-note-secret");
+
+    expect(optedInSummary).toContain("previous-access-token-secret");
+    expect(optedInSummary).toContain("current-access-token-secret");
+    expect(optedInSummary).toContain("previous-private-note-secret");
+    expect(optedInSummary).toContain("current-private-note-secret");
+
+    expect(formatterOnlyOptIn).not.toContain("previous-access-token-secret");
+    expect(formatterOnlyOptIn).not.toContain("current-access-token-secret");
+  });
+
   it("renders JSON Pointer paths without changing the structured path", () => {
     const report = comparePayloads({ "a/b": 1 }, { "a/b": 2 });
 

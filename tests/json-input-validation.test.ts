@@ -82,6 +82,8 @@ describe("runtime JSON input validation", () => {
     );
 
     expect(error.message).not.toContain("private-token-value");
+    expect(error.stack).not.toContain("private-token-value");
+    expect(error.message).not.toContain(JSON.stringify(current));
     expect(error.message).toContain('JSON Pointer "/users/1/profile/limit"');
   });
 

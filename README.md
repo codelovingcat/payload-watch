@@ -62,7 +62,7 @@ The core comparison and regression coverage are implemented, including runtime v
 
 ## Quick start
 
-PayloadWatch currently exposes a source-built ESM API. From a clean checkout, install the exact development dependency versions recorded in the committed lockfile and build the library:
+PayloadWatch currently exposes a source-built ESM API. From a clean checkout, install the development dependencies and build the library:
 
 ```bash
 npm ci
@@ -123,9 +123,17 @@ Run `npm test` to see the fixture-based end-to-end assertions in `tests/order-dr
 
 The [unchanged fixture](examples/order-payloads/unchanged.json) is also tested to ensure an equivalent pair returns `No changes detected.`.
 
+## API reference and runnable examples
+
+Start with the [Public API Reference](docs/api-reference.md) for every exported function, type, option and error, plus troubleshooting and known limitations. After `npm run build`, run `node examples/api-reference.mjs` for an executable walkthrough using synthetic order API snapshots. The example is also checked by CI.
+
+## Packed package installation checks
+
+For a reproducible local verification of the **actual npm tarball**, run `npm ci`, `npm run build`, then `npm run check:consumer`. It packs and installs the archive into an isolated temporary Node.js project and checks ESM runtime imports plus TypeScript NodeNext and Bundler type resolution. See [Clean Consumer Installation](docs/consumer-installation.md). This does not publish the package.
+
 ## Supported inputs and comparison rules
 
-The public input type is `JsonValue`: a JSON object, array, string, finite number, boolean, or `null`. Pass parsed data values, not a string containing serialized JSON. Runtime validation rejects unsupported JavaScript values before comparison and throws `InvalidJsonInputError` with the input name, a JSON Pointer path, and a concise reason. The error never serializes the full payload; see [Issue #13](https://github.com/codelovingcat/payload-watch/issues/13) and the [JSON Input Contract](docs/json-input-contract.md).
+The public input type is `JsonValue`: a JSON object, array, string, finite number, boolean, or `null`. Pass parsed data values, not a string containing serialized JSON. Runtime validation rejects unsupported JavaScript values before comparison and throws `InvalidJsonInputError` with the input name, a JSON Pointer path, and a concise reason. The error never serializes payload values; see [Issue #13](https://github.com/codelovingcat/payload-watch/issues/13) and the [JSON Input Contract](docs/json-input-contract.md).
 
 PayloadWatch reports four change kinds:
 
@@ -135,6 +143,10 @@ PayloadWatch reports four change kinds:
 - `type-changed`: the JSON type changed at that location.
 
 Paths use JSON Pointer (RFC 6901): the empty string `""` denotes the root, `~` is escaped as `~0`, and `/` within a property key is escaped as `~1`. Arrays are compared by index; the library does not infer moves or match objects by identity. Before/after values are omitted by default. For readable output, values require an opt-in on both `comparePayloads` and `formatComparisonReport`. When included, object and array values are detached snapshots, so changing a report value does not mutate either input payload.
+
+## Privacy and data handling
+
+PayloadWatch compares the values supplied by the caller; it does not make network requests, log payload values, or write payload data to files. Structured reports omit before/after values by default. Enabling `includeValues` puts detached copies of changed values into the returned report, so treat that report as sensitive. The text formatter also requires its own `includeValues: true` opt-in before showing any values. Validation errors identify the input, JSON Pointer path, and reason without serializing payload values; paths still contain property names, which may themselves be sensitive. See [Privacy and Data Handling](docs/privacy-and-data-handling.md) for guidance.
 
 The v0.1 release reports structural observations only. It does not label changes as breaking or non-breaking; see [Impact Classification Policy](docs/impact-classification-policy.md). Equality, missing-versus-null behavior, and type transitions are documented in [Comparison Semantics](docs/comparison-semantics.md). JSON Pointer construction, including unusual property names, is documented in [JSON Pointer Path Rules](docs/json-pointer-paths.md). For the detailed contract, see [JSON Input Contract](docs/json-input-contract.md), [Change Model and Path Format](docs/change-model.md), and [Array Comparison Policy](docs/array-comparison.md).
 
@@ -248,7 +260,7 @@ The initial development toolchain is configured as follows:
 - **Vite 8** — installed explicitly because Vitest 5 uses Vite as a peer dependency.
 - **npm** — installs development dependencies and runs project scripts.
 
-The tools are declared using compatible version ranges in `package.json`; the committed version-3 `package-lock.json` pins the resolved dependency tree. Use `npm ci` for a reproducible install from a fresh checkout. The package remains private and explicitly whitelists `dist/`, `README.md`, and `docs/` for packing. This is not a release-ready package yet: exports and declaration files, a license, and a clean consumer-project check remain outstanding.
+The repository tracks a version-3 `package-lock.json`, and `npm ci` is used for reproducible installs. ESM package exports, generated declarations and clean archive-consumer tests are implemented and tested by CI on Node.js 22/24. The package remains private at version `0.0.0`; the final license, versioning and publication decisions are separate.
 
 ### Prerequisites
 
@@ -260,7 +272,7 @@ The tools are declared using compatible version ranges in `package.json`; the co
 Clone the repository and enter its directory, then run:
 
 ```bash
-npm install
+npm ci
 npm run build
 npm run typecheck
 npm test
@@ -290,22 +302,21 @@ tests/
   regression.test.ts   # Focused JSON edge-case regression suite
   comparison-semantics.test.ts # Explicit equality and null semantics tests
   json-input-validation.test.ts # Runtime input validation and error tests
-  order-drift.test.ts  # Synthetic API drift fixture tests
   report-format.test.ts # Readable report formatting tests
-examples/
-  order-payloads/        # Synthetic baseline, current, and unchanged JSON snapshots
 tsconfig.json          # Strict TypeScript compiler settings
 vitest.config.ts       # Node.js test configuration
 ```
 
-The toolchain, recursive `JsonValue` types, structured change model, `comparePayloads` implementation, and runtime input validation are in place. The engine handles nested objects and arrays, primitive changes, additions/removals, type changes, deterministic traversal, and opt-in before/after values. Package exports and published declaration files will be verified separately before release.
+The toolchain, recursive `JsonValue` types, structured change model, `comparePayloads` implementation, and runtime input validation are in place. The engine handles nested objects and arrays, primitive changes, additions/removals, type changes, deterministic traversal, and opt-in before/after values. The ESM package entry points and generated TypeScript declarations are already verified in the isolated consumer checks. No npm publication has taken place.
 
 
 ## Contributing and project status
 
-This is an actively designed learning project. The goal is to build a useful tool while making the reasoning behind each design choice visible.
+PayloadWatch is an actively developed TypeScript-first learning and library project. Discussions and reproducible bug reports are welcome. Read [Contributing](CONTRIBUTING.md) for issue templates, local checks, pull-request expectations, and security-sensitive test data, and the [Code of Conduct](CODE_OF_CONDUCT.md) for collaboration standards.
 
-The comparison and report-formatting functions are implemented, but the npm package entry points and TypeScript declaration output are not finalized. The package is not published to npm and remains marked `private`; release-readiness work is tracked in [Release Readiness](docs/release-readiness.md). Please follow the GitHub Issues for the agreed scope and implementation progress.
+**Licensing decision pending:** The repository does not yet include a software `LICENSE` file. Its public visibility alone is not an open-source reuse license. The maintainer must explicitly select the intended terms before a license is added or code contributions are accepted. Review the [licensing decision guide](docs/licensing-decision.md) and [Issue #23](https://github.com/codelovingcat/payload-watch/issues/23). Until then, do not describe this repository as MIT, Apache-2.0, GPL, or otherwise licensed for external reuse.
+
+The package is not published to npm and remains `private: true`. The current ESM package export, generated TypeScript declarations, and consumer checks are described in [Package Entry Points](docs/package-entrypoints.md); release requirements are tracked in [Release Readiness](docs/release-readiness.md).
 
 ---
 
