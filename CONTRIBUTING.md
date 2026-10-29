@@ -2,9 +2,9 @@
 
 Thank you for helping make JSON API changes easier to understand. Contributions should stay focused on the agreed [MVP scope](docs/mvp-scope.md), stable comparison semantics, privacy-safe reports, and clear documentation.
 
-## License status before contributing code
+## License and contribution rights
 
-The repository currently has **no chosen software license**. Being public on GitHub does not by itself grant general permission to reuse or redistribute the project. Please raise issues and share reproducible ideas, but **do not submit a new code contribution for integration while license and contribution terms are unresolved**. Maintainers should not merge externally authored code until rights and terms are documented and agreed. Review [the licensing decision guide](docs/licensing-decision.md) and [Issue #23](https://github.com/codelovingcat/payload-watch/issues/23).
+PayloadWatch is distributed under the [MIT License](LICENSE), with copyright attribution to codelovingcat. Read its terms before redistributing. Code contributions are welcome after issue discussion; by submitting a pull request you confirm you have the rights to submit the contribution and agree it can be distributed under the repository's MIT license. Do not submit incompatible third-party code, copied proprietary work, secrets, or real customer payloads. No separate Contributor License Agreement is currently required.
 
 ## Before opening an issue
 
@@ -14,7 +14,7 @@ For a feature idea, describe the real use case, why the current API is insuffici
 
 ## Local development
 
-After a maintainer explicitly authorizes code contributions under a selected license, clone the repository and use a separate branch for one issue. Node.js **22.12.0 or newer** is required. From a fresh checkout run:
+Clone the repository and use a separate branch for one issue. Node.js **22.12.0 or newer** is required. From a fresh checkout run:
 
 ```bash
 npm ci

@@ -35,6 +35,7 @@ const tempRoot = mkdtempSync(join(tmpdir(), "payload-watch-package-check-"));
 try {
   const packageMetadata = JSON.parse(readFileSync(join(repositoryRoot, "package.json"), "utf8"));
   assert.equal(packageMetadata.private, true, "The package must remain private before release");
+  assert.equal(packageMetadata.license, "MIT", "Package SPDX license must match LICENSE");
   assert.equal(packageMetadata.type, "module");
   assert.equal(packageMetadata.main, "./dist/index.js");
   assert.equal(packageMetadata.types, "./dist/index.d.ts");
@@ -48,12 +49,12 @@ try {
 
   const entry = packed[0];
   const files = entry.files.map((file) => file.path);
-  for (const required of ["package.json", "dist/index.js", "dist/index.d.ts"]) {
+  for (const required of ["package.json", "LICENSE", "dist/index.js", "dist/index.d.ts"]) {
     assert.ok(files.includes(required), `Package is missing ${required}`);
   }
   for (const path of files) {
     assert.ok(
-      path === "package.json" || path === "README.md" || path.startsWith("dist/") || path.startsWith("docs/"),
+      path === "package.json" || path === "LICENSE" || path === "README.md" || path.startsWith("dist/") || path.startsWith("docs/"),
       `Unexpected packed file: ${path}`,
     );
     assert.ok(!path.split("/").some((segment) => segment === ".env" || segment.startsWith(".env.")),
