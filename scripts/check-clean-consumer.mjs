@@ -44,7 +44,7 @@ try {
   const dryPaths = dry[0].files.map((f) => f.path).sort();
   const actualPaths = actual[0].files.map((f) => f.path).sort();
   assert.deepEqual(actualPaths, dryPaths, "Dry-run and generated archive must contain the same files");
-  for (const path of ["package.json", "README.md", "dist/index.js", "dist/index.d.ts"]) {
+  for (const path of ["package.json", "README.md", "dist/index.js", "dist/index.d.ts", "bin/payload-watch.mjs"]) {
     assert.ok(actualPaths.includes(path), `Missing packed file: ${path}`);
   }
   if (pkg.license) {
@@ -53,7 +53,7 @@ try {
   for (const path of actualPaths) {
     assert.ok(
       path === "package.json" || path === "README.md" || path === "LICENSE" ||
-      path.startsWith("dist/") || path.startsWith("docs/"),
+      path.startsWith("dist/") || path.startsWith("docs/") || path.startsWith("bin/"),
       `Unexpected file in archive: ${path}`,
     );
     assert.ok(!path.split("/").some((segment) => segment === ".env" || segment.startsWith(".env.")),

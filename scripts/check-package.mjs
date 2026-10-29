@@ -49,12 +49,12 @@ try {
 
   const entry = packed[0];
   const files = entry.files.map((file) => file.path);
-  for (const required of ["package.json", "LICENSE", "dist/index.js", "dist/index.d.ts"]) {
+  for (const required of ["package.json", "LICENSE", "dist/index.js", "dist/index.d.ts", "bin/payload-watch.mjs"]) {
     assert.ok(files.includes(required), `Package is missing ${required}`);
   }
   for (const path of files) {
     assert.ok(
-      path === "package.json" || path === "LICENSE" || path === "README.md" || path.startsWith("dist/") || path.startsWith("docs/"),
+      path === "package.json" || path === "LICENSE" || path === "README.md" || path.startsWith("dist/") || path.startsWith("docs/") || path.startsWith("bin/"),
       `Unexpected packed file: ${path}`,
     );
     assert.ok(!path.split("/").some((segment) => segment === ".env" || segment.startsWith(".env.")),

@@ -127,6 +127,16 @@ The [unchanged fixture](examples/order-payloads/unchanged.json) is also tested t
 
 Pass `{ ignorePaths: ["/metadata/requestId"] }` to ignore an exact JSON Pointer path and its descendants. See [Ignore Paths](docs/ignore-paths.md) for escaping, edge cases and risks.
 
+## Optional local CLI (post-MVP)
+
+After `npm ci && npm run build`, compare two JSON files:
+
+```bash
+node bin/payload-watch.mjs compare examples/order-payloads/baseline.json examples/order-payloads/current.json
+```
+
+The executable is also named `payload-watch` when this package is installed from a local archive. The CLI is an optional file-reading layer; the core library remains synchronous and does not read files or make network calls. The initial CLI prints a human-readable report and returns exit code `0` for a valid comparison or `2` for usage, file and parse errors. See [CLI Usage](docs/cli.md).
+
 ## API reference and runnable examples
 
 Start with the [Public API Reference](docs/api-reference.md) for every exported function, type, option and error, plus troubleshooting and known limitations. After `npm run build`, run `node examples/api-reference.mjs` for an executable walkthrough using synthetic order API snapshots. The example is also checked by CI.
