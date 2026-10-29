@@ -123,6 +123,10 @@ Run `npm test` to see the fixture-based end-to-end assertions in `tests/order-dr
 
 The [unchanged fixture](examples/order-payloads/unchanged.json) is also tested to ensure an equivalent pair returns `No changes detected.`.
 
+## Optional ignore paths (post-MVP)
+
+Pass `{ ignorePaths: ["/metadata/requestId"] }` to ignore an exact JSON Pointer path and its descendants. See [Ignore Paths](docs/ignore-paths.md) for escaping, edge cases and risks.
+
 ## API reference and runnable examples
 
 Start with the [Public API Reference](docs/api-reference.md) for every exported function, type, option and error, plus troubleshooting and known limitations. After `npm run build`, run `node examples/api-reference.mjs` for an executable walkthrough using synthetic order API snapshots. The example is also checked by CI.
