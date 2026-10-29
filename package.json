@@ -23,7 +23,9 @@
     "test:watch": "vitest",
     "benchmark": "node scripts/benchmark.mjs",
     "check:package": "node scripts/check-package.mjs",
-    "check:consumer": "node scripts/check-clean-consumer.mjs"
+    "check:consumer": "node scripts/check-clean-consumer.mjs",
+    "release:preflight": "node scripts/release-preflight.mjs",
+    "test:release-preflight": "node --test tests/release-preflight.test.mjs"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",

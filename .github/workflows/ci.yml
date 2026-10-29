@@ -57,3 +57,6 @@ jobs:
 
       - name: Verify clean consumer installation
         run: npm run check:consumer
+
+      - name: Test non-publishing release preflight
+        run: npm run test:release-preflight

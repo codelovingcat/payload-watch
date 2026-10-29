@@ -190,6 +190,10 @@ Keeping the first release narrow should let us make the core behavior dependable
 - **Careful with data:** avoid logging full payloads or sensitive values by default; decide how before/after values should be exposed.
 - **Small and focused:** favor a clear core over an oversized feature set.
 
+## First npm release readiness
+
+Publication is not automatic. Review the [First Release Checklist](docs/first-release-checklist.md) and use `npm run release:preflight` to report local metadata blockers. The check **does not publish** and is expected to fail until the package has an explicitly approved release configuration.
+
 ## Development roadmap
 
 The GitHub Issues track the project from the first design decisions through testing and release preparation. The first 10 issues established the main workstreams; additional issues make the important technical and release tasks more explicit.
