@@ -2,13 +2,13 @@
 
 **Catch unexpected changes in JSON API responses before they turn into debugging sessions.**
 
-PayloadWatch is a TypeScript-first library under development for comparing JSON API payloads and explaining what changed between a known-good response and a new one.
+PayloadWatch is a TypeScript-first library for comparing JSON API payloads and explaining what changed between a known-good response and a new one. Its initial feature set is implemented and tested as a **private, unpublished `0.1.0` release candidate**.
 
 It is designed for developers who integrate with external services—such as commerce, payment, hiring, shipping, or CRM APIs—and need a faster way to answer a frustrating question:
 
 > “The API used to work. What changed in the response?”
 
-> **Project status:** Early implementation. The synchronous `comparePayloads` API compares nested objects, arrays by index, and primitive values. Runtime input validation rejects unsupported JavaScript values with a typed, path-aware `InvalidJsonInputError`. The package is not published, and the API may continue to evolve.
+> **Project status:** The `0.1.0` candidate includes the synchronous TypeScript/ESM comparison API, runtime JSON validation, readable and structured reports, optional exact `ignorePaths`, and a local JSON-file CLI. Builds, tests and consumer-package checks run in CI (Linux Node.js 22/24; Windows Node.js 22 CLI smoke). **Not yet published on npm:** `private: true` remains set. APIs may change before `1.0`.
 
 ## Why PayloadWatch?
 
@@ -45,11 +45,11 @@ At a glance, the response looks similar. But two important details changed:
 
 PayloadWatch aims to make these differences explicit, with paths and useful context, instead of making a developer discover them by repeatedly inspecting logs and tracing application code.
 
-## What are we building?
+## What does PayloadWatch do?
 
-The first version will focus on a small, well-defined job: **compare two JSON-compatible payloads and return a clear, structured description of their differences.**
+The implemented `0.1.0` release candidate focuses on a small, well-defined job: **compare two caller-provided JSON-compatible payloads and return a clear, structured description of their differences.**
 
-The current implementation compares two supplied JSON-compatible values and reports:
+The comparison engine reports:
 
 - **Added fields or array elements** — values present only in the current payload.
 - **Removed fields or array elements** — values present only in the previous payload.
@@ -58,11 +58,11 @@ The current implementation compares two supplied JSON-compatible values and repo
 - **Nested differences** — precise locations within objects and arrays.
 - **Readable summaries and structured reports** — text for people and typed records for code.
 
-The core comparison and regression coverage are implemented, including runtime validation for unsupported JavaScript values. Package exports and declarations, and release checks remain separate work. PayloadWatch reports observed structural differences rather than asserting universal breaking impact.
+Runtime validation, regression tests, ESM package exports, generated TypeScript declarations, and local archive/consumer checks are implemented. **Public npm publication is the remaining release gate**, tracked in [Issue #27](https://github.com/codelovingcat/payload-watch/issues/27). PayloadWatch reports observed structural differences rather than asserting universal breaking impact.
 
 ## Quick start
 
-PayloadWatch currently exposes a source-built ESM API. From a clean checkout, install the development dependencies and build the library:
+The candidate exposes an ESM API through the compiled package. **Until it is published**, use a source checkout or install a locally packed archive. From a clean checkout, install dependencies and build:
 
 ```bash
 npm ci
@@ -123,11 +123,11 @@ Run `npm test` to see the fixture-based end-to-end assertions in `tests/order-dr
 
 The [unchanged fixture](examples/order-payloads/unchanged.json) is also tested to ensure an equivalent pair returns `No changes detected.`.
 
-## Optional ignore paths (post-MVP)
+## Optional ignore paths (included in the 0.1.0 candidate)
 
 Pass `{ ignorePaths: ["/metadata/requestId"] }` to ignore an exact JSON Pointer path and its descendants. See [Ignore Paths](docs/ignore-paths.md) for escaping, edge cases and risks.
 
-## Optional local CLI (post-MVP)
+## Optional local CLI (included in the 0.1.0 candidate)
 
 After `npm ci && npm run build`, compare two JSON files:
 
@@ -182,9 +182,9 @@ A payload diff can show **what changed**. By itself, one or two JSON samples can
 
 For the v0.1 MVP, PayloadWatch reports structural differences only and does not label them as breaking, non-breaking, or unknown. A JSON diff alone cannot reliably establish impact for every consumer; the reasoning and examples are documented in [Impact Classification Policy](docs/impact-classification-policy.md). A future consumer-specific classification layer would need explicit, testable rules and must preserve the underlying observed changes.
 
-### Initial scope
+### Original MVP scope and actual release candidate
 
-The first milestone is focused on comparing supplied JSON-compatible values. Snapshot files, a command-line interface, HTTP integrations, watch mode, and CI integrations may be considered after the core comparison behavior is reliable.
+The original MVP scoped only the synchronous core comparison engine. The separately developed **local-file CLI and exact `ignorePaths`** option are now implemented and deliberately included in the private `0.1.0` candidate. Live HTTP integrations, background monitoring, automatic snapshot collection and a dedicated CI Action are **not** included. See the [historical MVP scope](docs/mvp-scope.md) and [release notes](docs/release-notes-0.1.0.md).
 
 ### Not the goal of the MVP
 
@@ -220,7 +220,7 @@ Publication is not automatic. Review the [First Release Checklist](docs/first-re
 
 The GitHub Issues track the project from the first design decisions through testing and release preparation. The first 10 issues established the main workstreams; additional issues make the important technical and release tasks more explicit.
 
-The proposed first-release boundaries and testable acceptance criteria live in [the MVP scope document](docs/mvp-scope.md). That document is the working agreement for v0.1; implementation details are finalized through the linked design issues.
+The original core-only boundaries and acceptance criteria are preserved in the [historical MVP scope document](docs/mvp-scope.md). The **actual private `0.1.0` candidate** also includes the optional CLI and `ignorePaths` described in [release notes](docs/release-notes-0.1.0.md); historical scope exclusions are not a description of the current package.
 
 The input contract and public API direction are documented in [JSON Input Contract and Public API Proposal](docs/json-input-contract.md). The recursive `JsonValue` types and synchronous `comparePayloads` function are implemented, and arrays are compared deterministically by index. Runtime input validation is implemented under Issue #13 and documented in the JSON Input Contract.
 The change record types, JSON Pointer path rules, ordering, and opt-in value exposure are described in [Change Model and Path Format](docs/change-model.md). The index-by-index array policy is documented in [Array Comparison Policy](docs/array-comparison.md). The v0.1 decision to defer impact classification is documented in [Impact Classification Policy](docs/impact-classification-policy.md). The readable summary and data-exposure safeguards are described in [Report Format](docs/report-format.md).
@@ -267,16 +267,16 @@ The end-to-end local workflow and remaining package-release checks are documente
 
 The [Post-MVP Review](docs/post-mvp-review.md) records which extensions have concrete evidence, where existing tools overlap, and which ideas remain unvalidated. It does not expand the first-release scope.
 
-### Phase 5 — Post-MVP developer experience
+### Phase 5 — Post-MVP developer experience (implemented extensions)
 
-These are deliberately later additions. The first version should prove that the core comparison behavior is dependable before we expand into a terminal workflow.
+These items were originally planned **after the core MVP**. CLI file comparison, JSON/text modes, exit codes and exact-path ignores have since been implemented and included in the private `0.1.0` candidate. Larger extensions remain subject to evidence and separate decisions.
 
 - [#15 — Add a CLI for comparing baseline and current JSON files](https://github.com/codelovingcat/payload-watch/issues/15)
 - [#16 — Add CLI output modes and CI-friendly exit codes](https://github.com/codelovingcat/payload-watch/issues/16)
 - [#17 — Support ignore paths for known volatile fields](https://github.com/codelovingcat/payload-watch/issues/17)
 - [#28 — Review post-MVP extensions and prioritize only validated needs](https://github.com/codelovingcat/payload-watch/issues/28)
 
-This roadmap separates the focused library MVP from later conveniences. Having an issue in the backlog does not mean it is already implemented or must ship in the first release; each issue has its own acceptance criteria.
+This roadmap records **development history**, not a list of unfinished features. Some originally post-MVP issues are completed and included in the current candidate; other ideas remain uncommitted. Only the private candidate scope and [release checklist](docs/first-release-checklist.md) determine what can be published.
 
 ## Technology and development setup
 

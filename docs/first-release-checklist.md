@@ -6,7 +6,7 @@
 
 The proposed first public version is `0.1.0` and is recorded in both `package.json` and `package-lock.json`. The package remains **`private: true`**. The release candidate includes the documented ESM comparison library, TypeScript declarations, default value-free structured/text reports, runtime validation, opt-in exact `ignorePaths`, and the separate local JSON comparison CLI (`--format text|json`, `--fail-on-change`, exit codes 0/1/2). CLI and ignores are explicit pre-1.0 additions, not 1.0 stability commitments.
 
-**Supported environment:** Node.js 22.12+ with ESM. CI exercises Node.js 22 and 24. Arrays are positional; there is no OpenAPI/JSON Schema interpretation, identity-aware array matching, live API calls or automatic API monitoring. See [Release Notes](release-notes-0.1.0.md) and the [API Reference](api-reference.md).
+**Supported environment:** Node.js 22.12+ with ESM. CI exercises the full suite on Linux Node.js 22/24 and local-file CLI smoke tests on Windows Node.js 22; this does not guarantee every platform/version combination. Arrays are positional; there is no OpenAPI/JSON Schema interpretation, identity-aware array matching, live API calls or automatic API monitoring. See [Release Notes](release-notes-0.1.0.md) and the [API Reference](api-reference.md).
 
 ## Evidence and checks
 

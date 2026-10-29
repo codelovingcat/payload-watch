@@ -22,6 +22,7 @@ Options may occur before or after file paths. `--format=json` works as well as `
 For text output only, JSON Pointer paths are display-escaped: a key containing a literal newline, carriage return, tab or ESC cannot insert another report line or terminal control sequence. For example, a key containing `line` + newline + `break` displays as `/line\nbreak`. Literal backslashes are doubled. Other control characters appear as `\uXXXX`.
 
 **JSON output and the library's `ComparisonReport` retain the exact canonical RFC 6901 paths.** Use `--format json` in scripts; do not parse the human-readable summary as machine data. Display escaping does not redact potentially sensitive property names.
+
 ## Output contracts
 
 - **Default `--format text`**: the core `formatComparisonReport` human-readable summary, with a newline.
@@ -36,4 +37,4 @@ For text output only, JSON Pointer paths are display-escaped: a key containing a
 
 All errors go to stderr without echoing JSON input text; successful results go to stdout. Both modes omit values by default; JSON Pointer property names can still reveal sensitive information. The CLI does not make HTTP requests or mutate files.
 
-The CLI is separate from the pure library comparison API. Test with `npm run test:cli` after `npm run build`. CI runs it on Node.js 22 and 24.
+The CLI is separate from the pure library comparison API. Test with `npm run test:cli` after `npm run build`. CI runs the full package checks on Linux Node.js 22 and 24 and the CLI smoke suite on Windows Node.js 22, including file paths with spaces and non-ASCII names.
