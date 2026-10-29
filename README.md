@@ -127,6 +127,10 @@ The [unchanged fixture](examples/order-payloads/unchanged.json) is also tested t
 
 Start with the [Public API Reference](docs/api-reference.md) for every exported function, type, option and error, plus troubleshooting and known limitations. After `npm run build`, run `node examples/api-reference.mjs` for an executable walkthrough using synthetic order API snapshots. The example is also checked by CI.
 
+## Packed package installation checks
+
+For a reproducible local verification of the **actual npm tarball**, run `npm ci`, `npm run build`, then `npm run check:consumer`. It packs and installs the archive into an isolated temporary Node.js project and checks ESM runtime imports plus TypeScript NodeNext and Bundler type resolution. See [Clean Consumer Installation](docs/consumer-installation.md). This does not publish the package.
+
 ## Supported inputs and comparison rules
 
 The public input type is `JsonValue`: a JSON object, array, string, finite number, boolean, or `null`. Pass parsed data values, not a string containing serialized JSON. Runtime validation rejects unsupported JavaScript values before comparison and throws `InvalidJsonInputError` with the input name, a JSON Pointer path, and a concise reason. The error never serializes payload values; see [Issue #13](https://github.com/codelovingcat/payload-watch/issues/13) and the [JSON Input Contract](docs/json-input-contract.md).
