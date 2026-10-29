@@ -304,9 +304,11 @@ The toolchain, recursive `JsonValue` types, structured change model, `comparePay
 
 ## Contributing and project status
 
-This is an actively designed learning project. The goal is to build a useful tool while making the reasoning behind each design choice visible.
+PayloadWatch is an actively developed TypeScript-first learning and library project. Discussions and reproducible bug reports are welcome. Read [Contributing](CONTRIBUTING.md) for issue templates, local checks, pull-request expectations, and security-sensitive test data, and the [Code of Conduct](CODE_OF_CONDUCT.md) for collaboration standards.
 
-The comparison and report-formatting functions are implemented, but the npm package entry points and TypeScript declaration output are not finalized. The package is not published to npm and remains marked `private`; release-readiness work is tracked in [Release Readiness](docs/release-readiness.md). Please follow the GitHub Issues for the agreed scope and implementation progress.
+**Licensing decision pending:** The repository does not yet include a software `LICENSE` file. Its public visibility alone is not an open-source reuse license. The maintainer must explicitly select the intended terms before a license is added or code contributions are accepted. Review the [licensing decision guide](docs/licensing-decision.md) and [Issue #23](https://github.com/codelovingcat/payload-watch/issues/23). Until then, do not describe this repository as MIT, Apache-2.0, GPL, or otherwise licensed for external reuse.
+
+The package is not published to npm and remains `private: true`. The current ESM package export, generated TypeScript declarations, and consumer checks are described in [Package Entry Points](docs/package-entrypoints.md); release requirements are tracked in [Release Readiness](docs/release-readiness.md).
 
 ---
 
