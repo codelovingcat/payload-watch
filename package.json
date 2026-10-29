@@ -38,6 +38,7 @@
     "docs/",
     "bin/"
   ],
+  "license": "MIT",
   "bin": {
     "payload-watch": "./bin/payload-watch.mjs"
   }
