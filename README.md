@@ -65,7 +65,7 @@ The core comparison and regression coverage are implemented, including runtime v
 PayloadWatch currently exposes a source-built ESM API. From a clean checkout, install the development dependencies and build the library:
 
 ```bash
-npm install
+npm ci
 npm run build
 ```
 
@@ -264,7 +264,7 @@ The initial development toolchain is configured as follows:
 - **Vite 8** — installed explicitly because Vitest 5 uses Vite as a peer dependency.
 - **npm** — installs development dependencies and runs project scripts.
 
-The tools are declared using compatible version ranges in `package.json`. This repository does not yet commit a `package-lock.json`, so `npm install` can resolve different compatible versions at different times; do not use `npm ci` until a reviewed lockfile is committed. The package remains private and explicitly whitelists `dist/`, `README.md`, and `docs/` for packing. This is not a release-ready package yet: exports and declaration files, a license, a lockfile, and a clean consumer-project check remain outstanding.
+The repository tracks a version-3 `package-lock.json`, and `npm ci` is used for reproducible installs. ESM package exports, generated declarations and clean archive-consumer tests are implemented and tested by CI on Node.js 22/24. The package remains private at version `0.0.0`; the final license, versioning and publication decisions are separate.
 
 ### Prerequisites
 
@@ -276,7 +276,7 @@ The tools are declared using compatible version ranges in `package.json`. This r
 Clone the repository and enter its directory, then run:
 
 ```bash
-npm install
+npm ci
 npm run build
 npm run typecheck
 npm test
@@ -311,7 +311,7 @@ tsconfig.json          # Strict TypeScript compiler settings
 vitest.config.ts       # Node.js test configuration
 ```
 
-The toolchain, recursive `JsonValue` types, structured change model, `comparePayloads` implementation, and runtime input validation are in place. The engine handles nested objects and arrays, primitive changes, additions/removals, type changes, deterministic traversal, and opt-in before/after values. Package exports and published declaration files will be verified separately before release.
+The toolchain, recursive `JsonValue` types, structured change model, `comparePayloads` implementation, and runtime input validation are in place. The engine handles nested objects and arrays, primitive changes, additions/removals, type changes, deterministic traversal, and opt-in before/after values. The ESM package entry points and generated TypeScript declarations are already verified in the isolated consumer checks. No npm publication has taken place.
 
 
 ## Contributing and project status
