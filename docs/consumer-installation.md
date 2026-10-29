@@ -4,7 +4,7 @@
 
 ## Goal and scope
 
-Validate the **actual .tgz archive** npm installs, separate from the repository's `src/` files. This is a release-readiness test, not an npm publication. The package remains `private: true` and has version `0.0.0` until release decisions are completed.
+Validate the **actual .tgz archive** npm installs, separate from the repository's `src/` files. This is a release-readiness test, not an npm publication. The package remains `private: true`, with candidate version `0.1.0`. No npm publication has happened.
 
 ## From a fresh checkout
 
@@ -24,7 +24,7 @@ The GitHub Actions CI matrix runs these checks on Node.js 22 and 24. The final c
 ## What the consumer check does
 
 1. Runs `npm pack --dry-run --json` and creates a real archive using `npm pack --json --pack-destination` (both with `--ignore-scripts`). It confirms that the file manifests match, required JavaScript/declaration files and README exist, and no unexpected development files are shipped.
-2. If the package declares a software license, verifies that `LICENSE` is packed and appears in the installed package. This intentionally works before or after the separate MIT license PR merges.
+2. If the package declares a software license, verifies that `LICENSE` is packed and appears in the installed package. The MIT license has been merged and is required in the packed archive.
 3. Installs the archive **offline** via `npm install` in a fresh temporary directory with its **own `package.json` and `node_modules`**, without downloading dependencies, running lifecycle scripts or publishing.
 4. Uses `import { ... } from "payload-watch"` in a standalone `.mjs` program to test actual ESM resolution, typed differences, privacy flags, primitive/root behavior, and invalid input errors. Confirms the module resolves from the **consumer's installed** `node_modules/payload-watch/dist/index.js`.
 5. Compiles an independent `.mts` file with strict TypeScript **NodeNext** configuration, then runs its emitted `.mjs` using Node.js. Compiles another consumer `.ts` in strict **Bundler** resolution mode with `noEmit`. Both resolve types from the installed package, not `src/`.

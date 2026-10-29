@@ -33,7 +33,7 @@ npm test
 npm run check:package
 ```
 
-`npm run check:package` creates a local npm tarball with `npm pack` and inspects the archive file list. It requires `dist/index.js` and `dist/index.d.ts` and rejects files outside the package allowlist (`package.json`, `LICENSE`, `README.md`, `dist/`, `docs/`), plus environment-file names. Then it installs the local tarball **offline** into a temporary, independent consumer directory and verifies a real ESM `import` at runtime and a strict TypeScript NodeNext `.mts` import with the project's installed compiler. Temporary files are removed after the check. No package is published and no real API payloads are used.
+`npm run check:package` creates a local npm tarball with `npm pack` and inspects the archive file list. It requires `dist/index.js` and `dist/index.d.ts` and rejects files outside the package allowlist (`package.json`, `LICENSE`, `README.md`, `dist/`, `docs/`, `bin/`), plus environment-file names. Then it installs the local tarball **offline** into a temporary, independent consumer directory and verifies a real ESM `import` at runtime and a strict TypeScript NodeNext `.mts` import with the project's installed compiler. Temporary files are removed after the check. No package is published and no real API payloads are used.
 
 The CI workflow runs this after build, type-check and unit tests on both Node.js 22 and 24. Confirm that both GitHub jobs pass on the PR; writing metadata alone does not establish a working artifact.
 
@@ -41,4 +41,4 @@ The CI workflow runs this after build, type-check and unit tests on both Node.js
 
 The existing `files` allowlist deliberately includes only generated `dist/` output and documentation. npm also includes `package.json` and the root `LICENSE`; the package check requires both. Test files, example fixtures, source-only files, environment files and build scripts are not intended to ship. Build output is ignored by Git but included in `npm pack` after compilation.
 
-The package remains `private: true`, at placeholder version `0.0.0`, and has **not** been released. This issue sets up and smoke-tests the initial artifact contract. [Issue #25](https://github.com/codelovingcat/payload-watch/issues/25) still covers the fuller clean-consumer compatibility and packaging review before a release, along with licensing and versioning decisions in the other release issues.
+The package is a **private `0.1.0` release candidate** and has **not** been published. Its optional CLI is included under `bin/` and clean-consumer validation is implemented. Archive checks do not authorize publication. This issue sets up and smoke-tests the initial artifact contract. [Issue #25](https://github.com/codelovingcat/payload-watch/issues/25) still covers the fuller clean-consumer compatibility and packaging review before a release, along with licensing and versioning decisions in the other release issues.

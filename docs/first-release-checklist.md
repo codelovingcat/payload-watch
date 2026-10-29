@@ -1,35 +1,47 @@
-# First npm release: explicit final approval
+# First npm release — `0.1.0` candidate and final approval gates
 
-**Issue:** [#27](https://github.com/codelovingcat/payload-watch/issues/27). This work **prepares** a release; it does not authorize publication.
+**Tracking Issue:** [#27](https://github.com/codelovingcat/payload-watch/issues/27). **Status:** private candidate, **not published**.
 
-The candidate first release is **0.1.0**, proposed only. The package stays `0.0.0` and `private: true` until a separately reviewed release decision. The v0.1 core covers ESM JSON comparisons, TypeScript declarations and safe default reports; optional post-MVP CLI/ignore features must be explicitly included or excluded during scope review.
+## Candidate scope reviewed
 
-## Owner checklist
+The proposed first public version is `0.1.0` and is recorded in both `package.json` and `package-lock.json`. The package remains **`private: true`**. The release candidate includes the documented ESM comparison library, TypeScript declarations, default value-free structured/text reports, runtime validation, opt-in exact `ignorePaths`, and the separate local JSON comparison CLI (`--format text|json`, `--fail-on-change`, exit codes 0/1/2). CLI and ignores are explicit pre-1.0 additions, not 1.0 stability commitments.
 
-- [ ] Confirm the MVP comparison behavior, validation, examples, README and actual CI on Node.js 22/24.
-- [ ] Merge [MIT license PR #52](https://github.com/codelovingcat/payload-watch/pull/52) and verify `LICENSE` is in the packed archive.
-- [ ] Reconcile legacy documentation in [PR #45](https://github.com/codelovingcat/payload-watch/pull/45) so it reflects the present lockfile, package exports and tests.
-- [ ] Merge the semantic-versioning policy and curated CHANGELOG in [Issue #26](https://github.com/codelovingcat/payload-watch/issues/26).
-- [ ] Run package and isolated consumer checks using the exact archive to be released.
-- [ ] Check that no production API payloads, secrets, keys or private files are packaged.
-- [ ] Deliberately select whether CLI and ignorePaths (post-MVP) enter the first version.
-- [ ] Confirm the npm name is available and controlled by the authorized account. Run `npm view payload-watch version`, `npm whoami` and follow npm's current registration rules; a 404 does **not** guarantee the name can be claimed.
-- [ ] Review required 2FA/trusted publishing, organization scopes, credentials, version and changelog. Never commit npm tokens.
-- [ ] Obtain explicit release approval. In a dedicated release PR change `private: true`, set `0.1.0` (or an approved version), update the lockfile and release notes together.
-- [ ] Publish only by an authorized maintainer after independent review; verify npm artifact, consumer install and GitHub release/tag.
+**Supported environment:** Node.js 22.12+ with ESM. CI exercises Node.js 22 and 24. Arrays are positional; there is no OpenAPI/JSON Schema interpretation, identity-aware array matching, live API calls or automatic API monitoring. See [Release Notes](release-notes-0.1.0.md) and the [API Reference](api-reference.md).
 
-## Safe local checks (no publishing)
+## Evidence and checks
+
+- [x] Core implementation, MIT `LICENSE`, tracked npm lockfile, ESM export map and TypeScript declarations are present.
+- [x] CI runs npm ci, build, typecheck, Vitest tests, CLI tests, examples, archive inspection and an offline isolated consumer install on Node.js 22/24.
+- [x] Release-scope decision recorded for the current candidate: CLI and `ignorePaths` included, with limitations documented.
+- [x] Synthetic test fixtures and default value omission are documented. The packed archive is restricted by the test allowlist; **re-run against final artifact**.
+- [ ] This exact candidate commit has successful CI and actual `npm pack`/consumer checks (review the PR Checks tab).
+- [ ] npm registry confirms that `payload-watch` is publishable by **your own authenticated npm account**; package-name availability has **not been verified**.
+- [ ] Verify npm account login and publication rights. For manual publish use npm's current 2FA requirements; prefer a secure, interactive maintainer session. **Do not put tokens or OTP values in GitHub Issues or this chat.**
+- [ ] Review precise tarball contents, npm metadata and license copyright ownership for the public release.
+- [ ] Explicit maintainer authorization for **public npm publication** and final version/name/scope.
+- [ ] Create a separate final publication change: switch `private` to `false`, update the two package check scripts that currently enforce `private: true`, and make sure CI remains green. Keep `npm publish` out of automatic PR workflows.
+- [ ] On publication day, move curated entries from `CHANGELOG.md` Unreleased to dated `0.1.0`; create a corresponding `v0.1.0` tag **only after publication is confirmed**.
+- [ ] An authorized maintainer publishes using npm (or a separately approved trusted-publisher workflow), then verifies the registry tarball, installs the published version into a clean project, and records the npm URL, Git tag and GitHub Release.
+
+## Safe validation (no publish)
 
 ```bash
 npm ci
 npm run build
 npm run typecheck
 npm test
+npm run test:cli
 npm run check:package
 npm run check:consumer
+npm run check:release-candidate
+npm pack --dry-run --json
 npm run release:preflight
 ```
 
-`release:preflight` is deliberately **blocking** until static metadata is ready: the `private` flag, placeholder version and missing prerequisites produce exit code 1. This local check makes **no** network requests or registry changes. Even exit 0 does not verify npm ownership, CI, secret scans or human approval. CI runs **unit tests** of the preflight checker, not the intentionally blocking command.
+`release:preflight` **must report a private-package blocker** even when the candidate is otherwise ready. `check:release-candidate` is a separate positive validation of the private 0.1.0 candidate. Neither performs npm publication, registry mutations or credential access.
 
-**There is no automatic `npm publish`, version bump, tag or deployment in this PR.** Publication remains an explicit future action.
+## Registry and authentication
+
+npm unscoped packages are public when published. The public name `payload-watch` has **not** been independently confirmed as available; a search result or `npm view` 404 alone cannot prove that an account may claim it. The owner must check the actual registry and publish rights. If using trusted publishing later, current npm guidance requires Node.js 22.14+ and npm 11.5.1+, with correct OIDC mapping; no trusted publishing configuration is assumed.
+
+**Do not close Issue #27 solely because this PR merges:** the issue's acceptance criteria include an actual authorized npm publication and recorded install URL.

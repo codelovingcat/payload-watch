@@ -206,7 +206,11 @@ Keeping the first release narrow should let us make the core behavior dependable
 
 ## Versioning and changes
 
-See [Versioning and Release Policy](docs/versioning-policy.md) and [CHANGELOG](CHANGELOG.md). PayloadWatch is still private at `0.0.0`; no npm release or stable API promise has been made.
+See [Versioning and Release Policy](docs/versioning-policy.md) and [CHANGELOG](CHANGELOG.md). PayloadWatch is a **private `0.1.0` release candidate**, not yet published on npm. No stable API promise has been made.
+
+## First release candidate — not yet published
+
+The first npm version candidate is **`0.1.0`**, including the core JSON comparison API, optional `ignorePaths`, and the local `payload-watch` CLI. The package is still `private: true`: **do not run `npm install payload-watch` expecting this version to exist on npm yet**. From a checkout, use `npm ci && npm run build && npm run check:release-candidate`, along with the existing tests. See [0.1.0 Release Notes](docs/release-notes-0.1.0.md) and [First Release Checklist](docs/first-release-checklist.md). No `npm publish`, Git tag or GitHub Release has been created.
 
 ## First npm release readiness
 
@@ -284,7 +288,7 @@ The initial development toolchain is configured as follows:
 - **Vite 8** — installed explicitly because Vitest 5 uses Vite as a peer dependency.
 - **npm** — installs development dependencies and runs project scripts.
 
-The repository tracks a version-3 `package-lock.json`, and `npm ci` is used for reproducible installs. ESM package exports, generated declarations and clean archive-consumer tests are implemented and tested by CI on Node.js 22/24. The package remains private at version `0.0.0`; the final license, versioning and publication decisions are separate.
+The repository tracks a version-3 `package-lock.json`, and `npm ci` is used for reproducible installs. ESM package exports, generated declarations and clean archive-consumer tests are implemented and tested by CI on Node.js 22/24. The package is a private `0.1.0` release candidate with MIT licensing; public npm name and publish permissions must still be verified.
 
 ### Prerequisites
 
@@ -340,7 +344,7 @@ PayloadWatch is an actively developed TypeScript-first learning and library proj
 
 **License:** PayloadWatch is available under the [MIT License](LICENSE) (Copyright © 2026 codelovingcat). Reuse, modification, and commercial use are permitted under its terms; retain the copyright and license notice. The decision is recorded in [Licensing Decision](docs/licensing-decision.md). We welcome original contributions under the same license; see [Contributing](CONTRIBUTING.md).
 
-The package is not published to npm and remains `private: true`. The current ESM package export, generated TypeScript declarations, and consumer checks are described in [Package Entry Points](docs/package-entrypoints.md); release requirements are tracked in [Release Readiness](docs/release-readiness.md).
+The `0.1.0` candidate is not published to npm and remains `private: true`. The current ESM package export, generated TypeScript declarations, and consumer checks are described in [Package Entry Points](docs/package-entrypoints.md); release requirements are tracked in [Release Readiness](docs/release-readiness.md).
 
 ---
 

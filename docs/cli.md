@@ -1,6 +1,6 @@
 # Optional JSON comparison CLI
 
-**Issues:** [#15](https://github.com/codelovingcat/payload-watch/issues/15) and [#16](https://github.com/codelovingcat/payload-watch/issues/16). This optional CLI is **post-MVP**; npm publication is gated separately.
+**Issues:** [#15](https://github.com/codelovingcat/payload-watch/issues/15) and [#16](https://github.com/codelovingcat/payload-watch/issues/16). This CLI was developed as **post-MVP work**, but is **included** in the private `0.1.0` candidate after review. npm publication remains gated separately. The CLI contract may evolve in pre-1.0 versions.
 
 After `npm ci && npm run build`:
 
