@@ -69,3 +69,33 @@ jobs:
 
       - name: Verify private 0.1.0 release candidate
         run: npm run check:release-candidate
+
+  windows-cli:
+    name: Windows CLI smoke (Node.js 22)
+    runs-on: windows-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Build library
+        run: npm run build
+
+      - name: Type-check TypeScript
+        run: npm run typecheck
+
+      - name: Run CLI file, format, path and exit-code smoke tests
+        run: npm run test:cli
