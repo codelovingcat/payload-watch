@@ -17,6 +17,10 @@ First candidate **0.1.0** is prepared, but **has not been published to npm**. Pa
 - Generated TypeScript declarations, API documentation, synthetic examples, MIT license and contribution guidelines.
 - Unit, regression, CLI, npm archive and clean-consumer validation on Node.js 22 and 24.
 
+### Fixed
+
+- Escape control characters and ambiguous literal backslashes in human-readable JSON Pointer paths to prevent injected terminal output. Structured report paths and JSON CLI output remain unchanged.
+
 ### Known limitations
 
 - Pre-1.0 API and output contracts are evolving; Node.js 22.12+ and ESM are required. No CommonJS or browser runtime guarantee.

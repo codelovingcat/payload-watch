@@ -17,6 +17,11 @@ payload-watch compare [--format text|json] [--fail-on-change] <previous.json> <c
 
 Options may occur before or after file paths. `--format=json` works as well as `--format json`. `--help` prints usage. Stdin is not supported.
 
+### Unusual key names and safe text output
+
+For text output only, JSON Pointer paths are display-escaped: a key containing a literal newline, carriage return, tab or ESC cannot insert another report line or terminal control sequence. For example, a key containing `line` + newline + `break` displays as `/line\nbreak`. Literal backslashes are doubled. Other control characters appear as `\uXXXX`.
+
+**JSON output and the library's `ComparisonReport` retain the exact canonical RFC 6901 paths.** Use `--format json` in scripts; do not parse the human-readable summary as machine data. Display escaping does not redact potentially sensitive property names.
 ## Output contracts
 
 - **Default `--format text`**: the core `formatComparisonReport` human-readable summary, with a newline.

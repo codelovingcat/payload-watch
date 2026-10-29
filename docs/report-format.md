@@ -50,6 +50,21 @@ No changes detected.
 
 For a root-level change, the summary uses `<root>` for readability. The structured report keeps the JSON Pointer root path as the empty string (`""`).
 
+## Safe display of unusual paths
+
+The **structured** `ComparisonReport.changes[].path` contains the exact RFC 6901 JSON Pointer. By contrast, `formatComparisonReport` escapes dangerous characters **only for human-readable display**, so unusual property names cannot add forged lines or terminal commands to text output.
+
+For example, a field whose key is the characters `line`, followed by an actual newline, then `break` produces a structured pointer containing that newline. Its readable display is:
+
+```text
+1 change detected:
+1. Value changed at /line\nbreak (type: number)
+```
+
+Literal backslashes are doubled (`\` displays as `\\`), LF/CR/tab appear as `\n`, `\r`, `\t`, and other ASCII/C1 control characters and selected bidirectional formatting marks use `\uXXXX` escapes. These representations are unambiguous in a text report, but **do not parse this text back into pointer values**: use `report.changes[].path` or CLI `--format json` for exact machine-readable paths.
+
+Ordinary paths such as `/customer/name` and the display-only `<root>` marker are unchanged. This hardening does not redact sensitive property names, so avoid placing confidential identifiers in logged paths.
+
 ## Value-exposure policy
 
 The summary formatter does not print before/after values by default, even if the structured report already contains values. To print those values, both the comparison and formatting calls must opt in:

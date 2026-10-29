@@ -143,4 +143,59 @@ describe("formatComparisonReport", () => {
 
     expect(report).toEqual(beforeFormatting);
   });
+
+  it("escapes controls and literal backslashes in displayed JSON Pointer paths", () => {
+    const previous = {
+      "removed\rline": 1,
+      "value\tfield": 1,
+      "type\u001b[31m": 1,
+      "backslash\\n": 1,
+      "direction\u202e": 1,
+      "next\u0085": 1,
+    };
+    const current = {
+      "added\nforged line": 1,
+      "value\tfield": 2,
+      "type\u001b[31m": "1",
+      "backslash\\n": 2,
+      "direction\u202e": 2,
+      "next\u0085": 2,
+    };
+
+    const report = comparePayloads(previous, current);
+    const paths = report.changes.map((change) => change.path);
+    expect(paths).toContain("/added\nforged line");
+    expect(paths).toContain("/removed\rline");
+    expect(paths).toContain("/value\tfield");
+    expect(paths).toContain("/type\u001b[31m");
+    expect(paths).toContain("/backslash\\n");
+    expect(paths).toContain("/direction\u202e");
+    expect(paths).toContain("/next\u0085");
+
+    const before = structuredClone(report);
+    const text = formatComparisonReport(report);
+    expect(text).toContain("Added value at /added\\nforged line");
+    expect(text).toContain("Removed value at /removed\\rline");
+    expect(text).toContain("Value changed at /value\\tfield");
+    expect(text).toContain("Type changed at /type\\u001b[31m");
+    expect(text).toContain("Value changed at /backslash\\\\n");
+    expect(text).toContain("Value changed at /direction\\u202e");
+    expect(text).toContain("Value changed at /next\\u0085");
+    expect(text).not.toMatch(/[\u0000-\u0009\u000b-\u001f\u007f-\u009f\u2028\u2029\u202a-\u202e\u2066-\u2069]/);
+    expect(text.split("\n")).toHaveLength(8); // header + seven changes; no injected lines
+    expect(report).toEqual(before);
+    expect(report.changes.every((change) => !("values" in change))).toBe(true);
+  });
+
+  it("keeps escaped display paths distinct from literal backslash sequences", () => {
+    const report = comparePayloads(
+      { "line\nbreak": 1, "line\\nbreak": 1 },
+      { "line\nbreak": 2, "line\\nbreak": 2 },
+    );
+    expect(report.changes).toHaveLength(2);
+    const text = formatComparisonReport(report);
+    expect(text).toContain("at /line\\nbreak");
+    expect(text).toContain("at /line\\\\nbreak");
+    expect(text.split("\n")).toHaveLength(3);
+  });
 });

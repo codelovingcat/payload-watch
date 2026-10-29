@@ -5,8 +5,26 @@ import type {
 } from "./change-model.js";
 import type { JsonValue } from "./json-value.js";
 
+/**
+ * Escape terminal controls for the readable report only. The raw RFC 6901
+ * pointer remains unchanged in ComparisonReport and JSON CLI output.
+ * Backslashes are doubled so a literal "\n" cannot look like a newline.
+ */
 function formatPath(path: string): string {
-  return path === "" ? "<root>" : path;
+  if (path === "") return "<root>";
+  return path.replace(
+    /[\\\u0000-\u001f\u007f-\u009f\u2028\u2029\u202a-\u202e\u2066-\u2069]/g,
+    (character) => {
+      switch (character) {
+        case "\\": return "\\\\";
+        case "\n": return "\\n";
+        case "\r": return "\\r";
+        case "\t": return "\\t";
+        default:
+          return "\\u" + character.charCodeAt(0).toString(16).padStart(4, "0");
+      }
+    },
+  );
 }
 
 /**

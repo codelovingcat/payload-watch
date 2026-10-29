@@ -95,3 +95,35 @@ describe("CI-friendly CLI output and exit codes", () => {
     assert.equal(missing.stdout, "");
   });
 });
+
+
+describe("unsafe JSON Pointer characters in CLI output", () => {
+  it("escapes text paths without changing the structured JSON paths or exit codes", () => {
+    const dir = mkdtempSync(join(tmpdir(), "payload-watch-control-path-"));
+    try {
+      const before = join(dir, "before.json");
+      const after = join(dir, "after.json");
+      const key = "key\nforged\r\t\u001b[31m";
+      writeFileSync(before, JSON.stringify({ [key]: "old" }));
+      writeFileSync(after, JSON.stringify({ [key]: "new" }));
+
+      const readable = run("compare", "--format", "text", before, after);
+      assert.equal(readable.status, 0);
+      assert.equal(readable.stderr, "");
+      assert.ok(readable.stdout.includes("/key\\nforged\\r\\t\\u001b[31m"));
+      assert.equal(readable.stdout.split("\n").length, 3);
+      assert.ok(!readable.stdout.includes("\u001b"));
+      assert.ok(!readable.stdout.includes("\r"));
+      assert.ok(!readable.stdout.includes("\t"));
+
+      const json = run("compare", "--format=json", "--fail-on-change", before, after);
+      assert.equal(json.status, 1);
+      assert.equal(json.stderr, "");
+      assert.equal(JSON.parse(json.stdout).changes[0].path, "/" + key);
+      assert.equal(JSON.parse(json.stdout).changes[0].kind, "value-changed");
+      assert.ok(!("values" in JSON.parse(json.stdout).changes[0]));
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+});
