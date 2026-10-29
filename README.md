@@ -239,6 +239,8 @@ The end-to-end local workflow and remaining package-release checks are documente
 - [#26 — Define semantic versioning and changelog policy](https://github.com/codelovingcat/payload-watch/issues/26)
 - [#27 — Prepare and publish the first npm release](https://github.com/codelovingcat/payload-watch/issues/27)
 
+The [Post-MVP Review](docs/post-mvp-review.md) records which extensions have concrete evidence, where existing tools overlap, and which ideas remain unvalidated. It does not expand the first-release scope.
+
 ### Phase 5 — Post-MVP developer experience
 
 These are deliberately later additions. The first version should prove that the core comparison behavior is dependable before we expand into a terminal workflow.
