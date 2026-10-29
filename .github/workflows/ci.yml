@@ -54,3 +54,6 @@ jobs:
 
       - name: Run documented API examples
         run: node examples/api-reference.mjs
+
+      - name: Verify clean consumer installation
+        run: npm run check:consumer
