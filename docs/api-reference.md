@@ -2,7 +2,7 @@
 
 **Tracking issue:** [#24 — API reference and troubleshooting](https://github.com/codelovingcat/payload-watch/issues/24)
 
-This reference describes the **currently implemented** ESM-only API from `src/index.ts`. The project is not yet published on npm (`private: true`); use a source checkout or a locally installed package archive for now. No HTTP requests, snapshot captures, CLI commands, persistence, or automatic API integrations are provided by the library.
+This reference describes the **currently implemented** ESM-only API from `src/index.ts`. The project is not yet published on npm (`private: true`); use a source checkout or a locally installed package archive for now. The **core library** does not fetch APIs, capture snapshots, read files, run CLI commands or persist data. A separate, optional local-file [CLI](cli.md) is included in this candidate.
 
 ## Setup
 
@@ -87,6 +87,8 @@ formatComparisonReport(report);
 // Deliberate second opt-in: includes the changed values in returned text.
 formatComparisonReport(report, { includeValues: true });
 ```
+
+**Exact-path ignores:** `comparePayloads` also accepts `{ ignorePaths: ["/metadata/requestId"] }`, which suppresses selected RFC 6901 paths and descendants. Such filtering can hide meaningful changes; see [Ignore Paths](ignore-paths.md).
 
 **Privacy:** even when the text output hides values, the `report` above **already contains** `old-secret` and `new-secret`. Avoid logging or distributing such reports without an appropriate redaction and access policy. A formatter-only opt-in cannot retrieve values absent from the report. JSON Pointer paths themselves may contain sensitive *property names*. See [Privacy and Data Handling](privacy-and-data-handling.md).
 
@@ -206,9 +208,9 @@ The renamed-looking customer field appears as **one added and one removed key**;
 
 - **Observation, not impact analysis:** a `PayloadChange` is not automatically a breaking-change verdict.
 - **No identity-aware array diffs:** no key matching, move detection or reorder interpretation.
-- **No built-in ignore list, schema inference, HTTP fetching, CLI, watch mode, or durable snapshot storage** in the current library release scope.
+- **No schema inference, HTTP fetching, watch mode, or durable snapshot storage** in the core library. Opt-in exact `ignorePaths` and the separate local-file CLI are included in the `0.1.0` candidate.
 - **No general automatic redaction:** use the default value-free report, or safely handle opt-in values and JSON Pointer paths.
 - **Synchronous and recursive:** very large or unusually deep payloads have not been assigned a guaranteed limit or performance SLA.
-- **Distribution not complete:** this is ESM-only, Node.js 22.12+, and **not yet published**. The repository has no selected software license yet; see [Licensing Decision](licensing-decision.md).
+- **Distribution not complete:** this is ESM-only, Node.js 22.12+, and **not yet published**. The repository is [MIT licensed](../LICENSE), though the `0.1.0` candidate is not yet published to npm.
 
 The executable examples and their expected output are checked in CI through `node examples/api-reference.mjs`, while Vitest covers the same comparison semantics independently of build output.

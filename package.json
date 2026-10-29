@@ -1,6 +1,6 @@
 {
   "name": "payload-watch",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
   "description": "A TypeScript-first library for detecting and explaining changes in JSON API payloads.",
   "type": "module",
@@ -26,7 +26,8 @@
     "check:consumer": "node scripts/check-clean-consumer.mjs",
     "test:cli": "node --test tests/cli.integration.test.mjs",
     "release:preflight": "node scripts/release-preflight.mjs",
-    "test:release-preflight": "node --test tests/release-preflight.test.mjs"
+    "test:release-preflight": "node --test tests/release-preflight.test.mjs",
+    "check:release-candidate": "node scripts/check-release-candidate.mjs"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
@@ -43,5 +44,21 @@
   "license": "MIT",
   "bin": {
     "payload-watch": "./bin/payload-watch.mjs"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/codelovingcat/payload-watch.git"
+  },
+  "homepage": "https://github.com/codelovingcat/payload-watch#readme",
+  "bugs": {
+    "url": "https://github.com/codelovingcat/payload-watch/issues"
+  },
+  "keywords": [
+    "json",
+    "api",
+    "payload",
+    "diff",
+    "typescript",
+    "cli"
+  ]
 }

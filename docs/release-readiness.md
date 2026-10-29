@@ -10,8 +10,8 @@
 | CI | GitHub Actions for Node.js 22 and 24 | Require passing final candidate checks |
 | Local install | `npm run check:consumer` installs archive into an external temp project | Verify the final artifact and supported module modes |
 | Security | Default values omitted; synthetic test data | Confirm no real payloads or secrets packed |
-| License | MIT terms tracked by [Issue #23](https://github.com/codelovingcat/payload-watch/issues/23) | Confirm approved root LICENSE and SPDX metadata are merged and packed |
-| Versioning | [Issue #26](https://github.com/codelovingcat/payload-watch/issues/26) | Merge agreed CHANGELOG and version policy |
+| License | MIT `LICENSE` and SPDX metadata are merged; checks require license in the tarball | Confirm attribution in the final release archive |
+| Versioning | SemVer policy merged and CHANGELOG curated; private `0.1.0` candidate prepared | Date release notes and create a tag only after publication |
 | npm publication | [Issue #27](https://github.com/codelovingcat/payload-watch/issues/27) | Explicit maintainer approval, npm name and rights check |
 
 ## Fresh-checkout validation
@@ -26,6 +26,6 @@ npm run check:consumer
 npm pack --dry-run --json
 ```
 
-Confirm the tarball contains required metadata, README, generated JavaScript and declaration files, documentation, and any approved LICENSE file. It should not unexpectedly include source-only code, dependencies, development test fixtures, personal data or environment secrets. Optional CLI files require a distinct release-scope review.
+Confirm the tarball contains required metadata, README, generated JavaScript and declaration files, documentation, and any approved LICENSE file. It should not unexpectedly include source-only code, dependencies, development test fixtures, personal data or environment secrets. The optional CLI and `ignorePaths` are included in this **0.1.0 candidate** as evolving pre-1.0 APIs; users should review the documented caveats.
 
-The package is intentionally `private: true` and `0.0.0` until a deliberate final release step. This Issue #10 update neither publishes to npm nor authorizes removing that safeguard.
+The package is intentionally `private: true` at candidate version `0.1.0` until a deliberate final publication step. This Issue #10 update neither publishes to npm nor authorizes removing that safeguard.
