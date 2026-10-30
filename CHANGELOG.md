@@ -23,6 +23,7 @@ First candidate **0.1.0** is prepared, but **has not been published to npm**. Pa
 
 ### Changed
 
+- Define a maximum JSON nesting depth of 512 (root depth 0), including ignored subtrees. Excessive depth now throws `InvalidJsonInputError` before recursive comparison instead of reaching the runtime call-stack limit; the CLI reports exit 2.
 - Make CLI test fixtures and missing-file paths portable across operating systems, and add a Windows Node.js 22 CLI smoke job covering text/JSON reports and exit codes.
 
 ### Known limitations

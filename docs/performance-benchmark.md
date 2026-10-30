@@ -61,4 +61,14 @@ Run comparisons on the same machine with the same Node.js version and settings w
 
 `tests/large-payload.test.ts` checks an unchanged 1,000-record comparison, a single change at the end of a large array, 1,000 reported changes, and a leaf change at depth 150. Run these tests with `npm test`. They contain no timing assertions.
 
-These fixtures validate behavior at the tested sizes and depth only. PayloadWatch does not yet promise a maximum supported payload size or nesting depth. Define such a boundary only after collecting measurements on representative environments and deciding what guarantees the project intends to make. No baseline measurements or optimization claims are included in this document because the benchmark has not been run as part of preparing this change.
+The input contract permits a maximum depth of **512**, counting the root as 0
+and each property/array element as one more level. `tests/json-depth.test.ts`
+checks object and array boundaries, included value snapshots and formatting, and
+typed rejection of an excessively deep parsed document. The CLI has matching
+boundary/error coverage. Deeper values fail with `InvalidJsonInputError` rather
+than relying on the runtime's call-stack limit.
+
+The benchmark's depth-250 scenarios remain within this supported boundary.
+PayloadWatch does not promise a maximum payload byte size or a performance SLA.
+Collect timings in representative environments; the boundary tests assert
+correctness rather than universal speed or memory usage.

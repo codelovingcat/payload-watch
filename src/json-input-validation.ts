@@ -1,6 +1,10 @@
 import { appendPointerSegment } from "./json-pointer.js";
 import { escapeDisplayControls } from "./display-escape.js";
 
+// The root is depth 0; every object property or array element adds one level.
+// Bound validation before recursive comparison, cloning and report formatting.
+const MAX_JSON_DEPTH = 512;
+
 export class InvalidJsonInputError extends TypeError {
   readonly input: "previousPayload" | "currentPayload";
   readonly path: string;
@@ -88,6 +92,7 @@ function validateArray(
   input: "previousPayload" | "currentPayload",
   path: string,
   ancestors: Set<object>,
+  depth: number,
 ): void {
   const lengthDescriptor = inspectOwnProperty(value, "length", input, path);
   if (
@@ -144,7 +149,7 @@ function validateArray(
     const propertyPath = appendPointerSegment(path, key);
     const descriptor = inspectOwnProperty(value, key, input, propertyPath);
     const element = validateDataProperty(descriptor, input, propertyPath);
-    validateNode(element, input, propertyPath, ancestors);
+    validateNode(element, input, propertyPath, ancestors, depth + 1);
     expectedIndex += 1;
   }
 
@@ -162,6 +167,7 @@ function validatePlainObject(
   input: "previousPayload" | "currentPayload",
   path: string,
   ancestors: Set<object>,
+  depth: number,
 ): void {
   const keys = inspectOwnKeys(value, input, path);
 
@@ -173,7 +179,7 @@ function validatePlainObject(
     const propertyPath = appendPointerSegment(path, key);
     const descriptor = inspectOwnProperty(value, key, input, propertyPath);
     const propertyValue = validateDataProperty(descriptor, input, propertyPath);
-    validateNode(propertyValue, input, propertyPath, ancestors);
+    validateNode(propertyValue, input, propertyPath, ancestors, depth + 1);
   }
 }
 
@@ -182,7 +188,12 @@ function validateNode(
   input: "previousPayload" | "currentPayload",
   path: string,
   ancestors: Set<object>,
+  depth: number,
 ): void {
+  if (depth > MAX_JSON_DEPTH) {
+    reject(input, path, `maximum nesting depth of ${MAX_JSON_DEPTH} exceeded (root depth is 0)`);
+  }
+
   if (value === null || typeof value === "string" || typeof value === "boolean") {
     return;
   }
@@ -234,7 +245,7 @@ function validateNode(
       if (prototype !== Array.prototype) {
         reject(input, path, "arrays with custom prototypes are not supported");
       }
-      validateArray(value, input, path, ancestors);
+      validateArray(value, input, path, ancestors, depth);
       return;
     }
 
@@ -246,7 +257,7 @@ function validateNode(
       );
     }
 
-    validatePlainObject(value, input, path, ancestors);
+    validatePlainObject(value, input, path, ancestors, depth);
   } finally {
     ancestors.delete(value);
   }
@@ -260,5 +271,5 @@ export function assertJsonValue(
   value: unknown,
   input: "previousPayload" | "currentPayload",
 ): asserts value is import("./json-value.js").JsonValue {
-  validateNode(value, input, "", new Set<object>());
+  validateNode(value, input, "", new Set<object>(), 0);
 }

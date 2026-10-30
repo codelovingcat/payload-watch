@@ -304,3 +304,30 @@ describe("safe CLI error display", () => {
     }
   });
 });
+
+describe("CLI JSON nesting boundary", () => {
+  it("reports excessive depth in either file with exit 2 and no payload values", () => {
+    const deep = '{"x":'.repeat(5000) + '"private-depth-value"' + '}'.repeat(5000);
+    for (const input of ["previous", "current"]) {
+      withJsonBytes(input === "previous" ? deep : "{}", input === "current" ? deep : "{}", (before, after) => {
+        const p = run("compare", "--format=json", "--fail-on-change", before, after);
+        assert.equal(p.status, 2);
+        assert.equal(p.stdout, "");
+        assert.match(p.stderr, new RegExp(`Invalid ${input}Payload`));
+        assert.match(p.stderr, /maximum nesting depth of 512 exceeded/);
+        assert.ok(!p.stderr.includes("RangeError"));
+        assert.ok(!p.stderr.includes("private-depth-value"));
+      });
+    }
+  });
+
+  it("compares valid files at the depth boundary", () => {
+    const json = leaf => '{"x":'.repeat(512) + leaf + '}'.repeat(512);
+    withJsonBytes(json("0"), json("1"), (before, after) => {
+      const p = run("compare", "--format=json", "--fail-on-change", before, after);
+      assert.equal(p.status, 1, p.stderr);
+      assert.equal(p.stderr, "");
+      assert.equal(JSON.parse(p.stdout).changes[0].path, "/x".repeat(512));
+    });
+  });
+});
