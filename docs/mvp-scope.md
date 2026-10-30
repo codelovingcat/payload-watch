@@ -3,7 +3,7 @@
 **Status:** Historical MVP scope agreement (original core-only boundaries; retained for design traceability)  
 **Tracking issue:** [#1 — Define the MVP scope and acceptance criteria](https://github.com/codelovingcat/payload-watch/issues/1)
 
-This document records the **original proposed scope**, so its future-tense decisions and exclusions are preserved as historical requirements rather than rewritten. The core comparison implementation, tests and packaging now exist. In addition, the optional local CLI and exact `ignorePaths` were developed in later issues and are **included in the private, unpublished `0.1.0` release candidate**. For the actual candidate behavior, see [Public API Reference](api-reference.md), [CLI Usage](cli.md), [Ignore Paths](ignore-paths.md) and [0.1.0 Release Notes](release-notes-0.1.0.md).
+This document records the **original proposed scope**, so its future-tense decisions and exclusions are preserved as historical requirements rather than rewritten. The core comparison implementation, tests and packaging now exist. In addition, the optional local CLI and exact `ignorePaths` were developed in later issues and are **included in the unpublished `0.1.0` release candidate**. For the actual candidate behavior, see [Public API Reference](api-reference.md), [CLI Usage](cli.md), [Ignore Paths](ignore-paths.md) and [0.1.0 Release Notes](release-notes-0.1.0.md).
 
 ## 1. Problem and target user
 

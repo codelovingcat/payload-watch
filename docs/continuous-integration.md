@@ -2,7 +2,7 @@
 
 **Tracking issue:** [#21 — Run build, tests, and type checks on GitHub Actions](https://github.com/codelovingcat/payload-watch/issues/21)
 
-The [CI workflow](../.github/workflows/ci.yml) verifies PayloadWatch from a clean GitHub-hosted checkout. It runs when a pull request targets `main`, when code is pushed to `main`, or when a maintainer starts it manually with `workflow_dispatch`.
+The [CI workflow](https://github.com/codelovingcat/payload-watch/blob/main/.github/workflows/ci.yml) verifies PayloadWatch from a clean GitHub-hosted checkout. It runs when a pull request targets `main`, when code is pushed to `main`, or when a maintainer starts it manually with `workflow_dispatch`.
 
 ## Supported Node.js versions in CI
 

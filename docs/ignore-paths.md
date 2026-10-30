@@ -1,6 +1,6 @@
 # Optional ignorePaths — exact JSON Pointer rules
 
-**Tracking:** [Issue #17](https://github.com/codelovingcat/payload-watch/issues/17). This was developed as a **post-MVP** option and is **included** in the private `0.1.0` candidate; pre-1.0 contracts may change.
+**Tracking:** [Issue #17](https://github.com/codelovingcat/payload-watch/issues/17). This was developed as a **post-MVP** option and is **included** in the unpublished `0.1.0` candidate; pre-1.0 contracts may change.
 
 Pass `ignorePaths` to `comparePayloads` to omit exact JSON Pointer locations **and descendants**:
 

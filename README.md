@@ -1,87 +1,66 @@
 # PayloadWatch
 
-**Catch unexpected changes in JSON API responses before they turn into debugging sessions.**
+**Detect changes between two JSON API responses, with typed reports and readable explanations.**
 
-PayloadWatch is a TypeScript-first library for comparing JSON API payloads and explaining what changed between a known-good response and a new one. Its initial feature set is implemented and tested as a **private, unpublished `0.1.0` release candidate**.
+PayloadWatch is a synchronous TypeScript/JavaScript library and an optional local-file CLI. It reports added or removed fields, primitive value changes and type changes, including nested objects and arrays. It has **no runtime dependencies** and does not fetch, store or transmit your payloads.
 
-It is designed for developers who integrate with external services—such as commerce, payment, hiring, shipping, or CRM APIs—and need a faster way to answer a frustrating question:
+> **Release status:** `0.1.0` is prepared for public npm distribution but **not yet published**. Until publication is confirmed in [Issue #27](https://github.com/codelovingcat/payload-watch/issues/27), install a local archive as described below. The API is pre-1.0 and may change.
 
-> “The API used to work. What changed in the response?”
+## Requirements and compatibility
 
-> **Project status:** The `0.1.0` candidate includes the synchronous TypeScript/ESM comparison API, runtime JSON validation, readable and structured reports, optional exact `ignorePaths`, and a local JSON-file CLI. Builds, tests and consumer-package checks run in CI (Linux Node.js 22/24; Windows Node.js 22 CLI smoke). **Not yet published on npm:** `private: true` remains set. APIs may change before `1.0`.
+| Environment | Support |
+| --- | --- |
+| Node.js application | Node.js **22.12+**, using ESM `import` |
+| JavaScript | Compiled JavaScript is included; TypeScript is not required at runtime |
+| TypeScript | `.d.ts` declarations are included; no separate `@types/payload-watch` package |
+| CI coverage | Full suite on Linux Node.js 22/24; CLI smoke tests on Windows Node.js 22 |
+| CommonJS or browser | No dedicated CommonJS build or tested browser runtime; Bundler type resolution alone is tested |
 
-## Why PayloadWatch?
+Use the public package root, `payload-watch`, rather than internal `dist/` subpaths. An installed package is already compiled: consuming applications do not run this repository's build or install its development dependencies.
 
-External APIs can change in ways that are easy to miss. A field may disappear, a value may change type, or an object may be reshaped. Your application may then receive unexpected data, fail validation, skip a workflow, or produce an error far away from the original cause.
+## Installation
 
-For example, an integration may expect:
+### Use the candidate now
 
-```json
-{
-  "id": 482,
-  "status": "ready",
-  "customer": {
-    "name": "Deniz"
-  }
-}
-```
-
-A later response might look like this:
-
-```json
-{
-  "id": "482",
-  "status": "ready",
-  "customer": {
-    "fullName": "Deniz"
-  }
-}
-```
-
-At a glance, the response looks similar. But two important details changed:
-
-- `id` changed from a number to a string.
-- `customer.name` was replaced by `customer.fullName`.
-
-PayloadWatch aims to make these differences explicit, with paths and useful context, instead of making a developer discover them by repeatedly inspecting logs and tracing application code.
-
-## What does PayloadWatch do?
-
-The implemented `0.1.0` release candidate focuses on a small, well-defined job: **compare two caller-provided JSON-compatible payloads and return a clear, structured description of their differences.**
-
-The comparison engine reports:
-
-- **Added fields or array elements** — values present only in the current payload.
-- **Removed fields or array elements** — values present only in the previous payload.
-- **Changed primitive values** — values that differ while keeping the same JSON type.
-- **Type changes** — for example, `number → string` or `object → null`.
-- **Nested differences** — precise locations within objects and arrays.
-- **Readable summaries and structured reports** — text for people and typed records for code.
-
-Runtime validation, regression tests, ESM package exports, generated TypeScript declarations, and local archive/consumer checks are implemented. **Public npm publication is the remaining release gate**, tracked in [Issue #27](https://github.com/codelovingcat/payload-watch/issues/27). PayloadWatch reports observed structural differences rather than asserting universal breaking impact.
-
-## Quick start
-
-The candidate exposes an ESM API through the compiled package. **Until it is published**, use a source checkout or install a locally packed archive. From a clean checkout, install dependencies and build:
+Build an installable archive from a checkout:
 
 ```bash
+git clone https://github.com/codelovingcat/payload-watch.git
+cd payload-watch
 npm ci
-npm run build
+npm pack
 ```
 
-Create `example.mjs` in the repository root and run it with `node example.mjs`:
+`npm pack` runs the build automatically and creates `payload-watch-0.1.0.tgz`. In **your application's directory**, install that file, substituting its actual absolute path:
+
+```bash
+npm install /absolute/path/to/payload-watch-0.1.0.tgz
+```
+
+### After the first npm publication
+
+Once the registry version exists, applications can install it directly:
+
+```bash
+npm install payload-watch@0.1.0
+```
+
+The registry command is not available for this version until publication completes. The local archive provides the same public imports today.
+
+## JavaScript quick start
+
+Save this as `example.mjs` in the application that installed the package, then run `node example.mjs`. Alternatively use `.js` files with `"type": "module"` in the application's `package.json`.
+
+<!-- example:javascript -->
 
 ```js
-import { comparePayloads, formatComparisonReport } from "./dist/index.js";
+import { comparePayloads, formatComparisonReport } from "payload-watch";
 
-// Sample snapshots from a fictional third-party customer API.
-// No live API request is made by PayloadWatch.
 const previousPayload = {
   id: 482,
   status: "ready",
   customer: { name: "Deniz" },
 };
-
 const currentPayload = {
   id: "482",
   status: "ready",
@@ -89,12 +68,12 @@ const currentPayload = {
 };
 
 const report = comparePayloads(previousPayload, currentPayload);
-
 console.log(formatComparisonReport(report));
-console.log(report.changes);
 ```
 
-The readable summary is:
+Output:
+
+<!-- example:output -->
 
 ```text
 3 changes detected:
@@ -103,253 +82,142 @@ The readable summary is:
 3. Type changed at /id (number → string)
 ```
 
-`comparePayloads` returns the structured report; `formatComparisonReport` turns it into text. Both functions operate on the values passed to them—they do not fetch third-party data, log it automatically, or transmit it anywhere.
+`report.changes` is the structured array for application logic; an empty array means no observed differences. Each entry has `kind` and `path`, with the relevant `previousType` and/or `currentType`. All data above is fictional.
 
-## Realistic example: order API drift
+## TypeScript quick start
 
-The [synthetic order fixtures](examples/order-payloads/) show a common API update. Across the two snapshots, the order ID changes from a number to a string, `customer.name` is replaced by `customer.fullName`, an item quantity and shipping details change, and a new item appears. All names, IDs, addresses, and prices are fictional; the email uses the reserved `.invalid` domain, and no live API is called.
-
-Run `npm test` to see the fixture-based end-to-end assertions in `tests/order-drift.test.ts`. The expected report contains these seven paths:
-
-```text
-/customer/fullName
-/customer/name
-/items/0/quantity
-/items/2
-/orderId
-/shipping/address/city
-/shipping/method
-```
-
-The [unchanged fixture](examples/order-payloads/unchanged.json) is also tested to ensure an equivalent pair returns `No changes detected.`.
-
-## Optional ignore paths (included in the 0.1.0 candidate)
-
-Pass `{ ignorePaths: ["/metadata/requestId"] }` to ignore an exact JSON Pointer path and its descendants. See [Ignore Paths](docs/ignore-paths.md) for escaping, edge cases and risks.
-
-## Optional local CLI (included in the 0.1.0 candidate)
-
-After `npm ci && npm run build`, compare two JSON files:
+In your application, add `"type": "module"` to `package.json` and install TypeScript tooling if needed:
 
 ```bash
-node bin/payload-watch.mjs compare examples/order-payloads/baseline.json examples/order-payloads/current.json
+npm install --save-dev typescript @types/node
 ```
 
-The executable is also named `payload-watch` when this package is installed from a local archive. The CLI is an optional file-reading layer; the core library remains synchronous and does not read files or make network calls. The CLI supports text or machine-readable JSON output, plus `--fail-on-change` (exit code `1` on differences); usage, file and parse errors return `2`. See [CLI Usage](docs/cli.md).
+A minimal `tsconfig.json`:
 
-## API reference and runnable examples
+<!-- example:tsconfig -->
 
-Start with the [Public API Reference](docs/api-reference.md) for every exported function, type, option and error, plus troubleshooting and known limitations. After `npm run build`, run `node examples/api-reference.mjs` for an executable walkthrough using synthetic order API snapshots. The example is also checked by CI.
+```json
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "strict": true,
+    "outDir": "dist"
+  }
+}
+```
 
-## Packed package installation checks
+Save this as `example.ts`, compile with `npx tsc -p tsconfig.json`, then run `node dist/example.js`:
 
-For a reproducible local verification of the **actual npm tarball**, run `npm ci`, `npm run build`, then `npm run check:consumer`. It packs and installs the archive into an isolated temporary Node.js project and checks ESM runtime imports plus TypeScript NodeNext and Bundler type resolution. See [Clean Consumer Installation](docs/consumer-installation.md). This does not publish the package.
+<!-- example:typescript -->
 
-## Supported inputs and comparison rules
+```ts
+import { comparePayloads, formatComparisonReport } from "payload-watch";
+import type { ComparisonReport, JsonValue } from "payload-watch";
 
-Nesting is limited to **512 levels from root depth 0**. Each object property or
-array element adds one level. Excess depth produces `InvalidJsonInputError`
-with the input and path (CLI exit `2`), including inside ignored subtrees.
+const baseline: JsonValue = { id: 482, status: "ready" };
+const current: JsonValue = { id: "482", status: "ready" };
+const report: ComparisonReport = comparePayloads(baseline, current);
 
-The public input type is `JsonValue`: a JSON object, array, string, finite number, boolean, or `null`. Pass parsed data values, not a string containing serialized JSON. Runtime validation rejects unsupported JavaScript values before comparison and throws `InvalidJsonInputError` with the input name, a JSON Pointer path, and a concise reason. The error never serializes payload values; see [Issue #13](https://github.com/codelovingcat/payload-watch/issues/13) and the [JSON Input Contract](docs/json-input-contract.md).
+if (report.changes.length > 0) {
+  console.log(formatComparisonReport(report));
+}
+```
 
-PayloadWatch reports four change kinds:
+Both quick starts are compiled or executed against an independently installed archive by `npm run check:consumer`. See [Package Entry Points](docs/package-entrypoints.md) for supported resolution modes.
 
-- `added`: a property or array element exists only in the current value.
-- `removed`: a property or array element exists only in the previous value.
-- `value-changed`: a primitive value changed but kept its JSON type.
-- `type-changed`: the JSON type changed at that location.
+## Options and input errors
 
-Paths use JSON Pointer (RFC 6901): the empty string `""` denotes the root, `~` is escaped as `~0`, and `/` within a property key is escaped as `~1`. Arrays are compared by index; the library does not infer moves or match objects by identity. Before/after values are omitted by default. For readable output, values require an opt-in on both `comparePayloads` and `formatComparisonReport`. When included, object and array values are detached snapshots, so changing a report value does not mutate either input payload.
+`comparePayloads(previous, current, options?)` accepts parsed JSON-compatible values, not serialized JSON text. If you have response text, call `JSON.parse` first. A string is itself a valid JSON value and is compared as a string.
 
-## Privacy and data handling
+| Option | Default | Effect |
+| --- | --- | --- |
+| `comparePayloads`: `includeValues` | `false` | Attach detached before/after values to changed records |
+| `comparePayloads`: `ignorePaths` | `[]` | Omit exact RFC 6901 paths and their descendants; no wildcards |
+| `formatComparisonReport`: `includeValues` | `false` | Show values already included in the report |
 
-PayloadWatch compares the values supplied by the caller; it does not make network requests, log payload values, or write payload data to files. Structured reports omit before/after values by default. Enabling `includeValues` puts detached copies of changed values into the returned report, so treat that report as sensitive. The text formatter also requires its own `includeValues: true` opt-in before showing any values. Validation errors identify the input, JSON Pointer path, and reason without serializing payload values; paths still contain property names, which may themselves be sensitive. See [Privacy and Data Handling](docs/privacy-and-data-handling.md) for guidance.
+```js
+const report = comparePayloads(previousPayload, currentPayload, {
+  ignorePaths: ["/metadata/requestId"],
+  includeValues: true,
+});
+const textWithValues = formatComparisonReport(report, { includeValues: true });
+```
 
-The v0.1 release reports structural observations only. It does not label changes as breaking or non-breaking; see [Impact Classification Policy](docs/impact-classification-policy.md). Equality, missing-versus-null behavior, and type transitions are documented in [Comparison Semantics](docs/comparison-semantics.md). JSON Pointer construction, including unusual property names, is documented in [JSON Pointer Path Rules](docs/json-pointer-paths.md). For the detailed contract, see [JSON Input Contract](docs/json-input-contract.md), [Change Model and Path Format](docs/change-model.md), and [Array Comparison Policy](docs/array-comparison.md).
+Showing values requires **both** opt-ins. Treat such reports as sensitive. Paths can expose property names even when values are omitted. Reports and inputs are not logged automatically; the examples explicitly choose to print summaries.
 
-## Who is it for?
+Unsupported runtime inputs throw `InvalidJsonInputError` with `input` (`previous` or `current`), `path` and `reason`:
 
-PayloadWatch is intended for developers who:
+```js
+import { comparePayloads, InvalidJsonInputError } from "payload-watch";
 
-- integrate with third-party APIs they do not control;
-- want to compare a saved response with a response captured later;
-- investigate unexplained integration failures;
-- maintain tests for external API contracts;
-- want change reports that are easier to understand than a large raw JSON diff.
+try {
+  comparePayloads({ amount: Number.NaN }, { amount: 10 });
+} catch (error) {
+  if (error instanceof InvalidJsonInputError) {
+    console.error(error.message); // identifies input/path/reason, not payload values
+  } else {
+    throw error;
+  }
+}
+```
 
-A useful scenario is an application that consumes a third-party commerce API. When a product, order, or customer response changes, a developer could compare the last known-good payload with the latest payload and see which fields changed.
+See [JSON Input Contract](docs/json-input-contract.md), [Ignore Paths](docs/ignore-paths.md) and [Privacy](docs/privacy-and-data-handling.md).
 
-## What PayloadWatch will—and will not—claim
+## Local-file CLI
 
-A payload diff can show **what changed**. By itself, one or two JSON samples cannot always prove whether a change is breaking for every consumer. For example, adding an optional field may be harmless to one application but unexpected for another.
+After installing the archive (or, after publication, the registry package), compare two UTF-8 JSON files from your application:
 
-For the v0.1 MVP, PayloadWatch reports structural differences only and does not label them as breaking, non-breaking, or unknown. A JSON diff alone cannot reliably establish impact for every consumer; the reasoning and examples are documented in [Impact Classification Policy](docs/impact-classification-policy.md). A future consumer-specific classification layer would need explicit, testable rules and must preserve the underlying observed changes.
+```bash
+npx --no-install payload-watch compare previous.json current.json
+npx --no-install payload-watch compare previous.json current.json --format json --fail-on-change
+```
 
-### Original MVP scope and actual release candidate
+| Exit code | Meaning |
+| --- | --- |
+| `0` | Successful comparison; differences are allowed unless `--fail-on-change` is set |
+| `1` | Differences found with `--fail-on-change` |
+| `2` | Invalid arguments, unreadable file, invalid UTF-8/JSON or unsupported input |
 
-The original MVP scoped only the synchronous core comparison engine. The separately developed **local-file CLI and exact `ignorePaths`** option are now implemented and deliberately included in the private `0.1.0` candidate. Live HTTP integrations, background monitoring, automatic snapshot collection and a dedicated CI Action are **not** included. See the [historical MVP scope](docs/mvp-scope.md) and [release notes](docs/release-notes-0.1.0.md).
+A single leading UTF-8 BOM is accepted; malformed UTF-8 is rejected. The CLI reads local files. The core API does not read files or make network requests. See [CLI Usage](docs/cli.md) for the complete syntax.
 
-### Not the goal of the MVP
+## Comparison rules and limits
 
-- Making HTTP requests to third-party services.
-- Replacing API documentation, schemas, or contract tests.
-- Claiming to infer every semantic or business-level API change.
-- Automatically capturing or storing production credentials or sensitive responses.
+- Change kinds: `added`, `removed`, `value-changed`, `type-changed`.
+- Paths are JSON Pointers: root is `""`; a key's `~` becomes `~0` and `/` becomes `~1`.
+- Arrays compare by **index**, without identity matching or move detection.
+- Missing properties differ from explicit `null`. Object key order does not affect equality.
+- Inputs must be JSON-compatible: no `undefined`, `BigInt`, functions, `Date`, sparse arrays, non-finite numbers or cycles. See the full input contract for object/accessor restrictions.
+- Maximum depth is **512**, with root depth 0 and one level per property/element. Deeper input throws `InvalidJsonInputError`, including in ignored subtrees.
+- Inputs are not mutated. Included object/array values are detached snapshots.
+- A difference does not by itself prove an API change is breaking. There is no schema interpretation, live monitoring, automatic snapshot collection or JSON Patch output.
 
-Keeping the first release narrow should let us make the core behavior dependable before adding integrations.
+The implementation is suitable for the documented Node.js use cases; validate your own integration and payload sizes. Pre-1.0 is not a promise of a permanently stable API. See [Comparison Semantics](docs/comparison-semantics.md), [Array Policy](docs/array-comparison.md), [Impact Policy](docs/impact-classification-policy.md) and [Performance](docs/performance-benchmark.md).
 
-## Design principles
+## Documentation and development
 
-- **Predictable:** the same inputs should produce the same change report.
-- **Understandable:** every reported change should identify where it occurred and what was observed.
-- **Type-safe:** use TypeScript to make the library's public API clear and useful to consumers.
-- **Tested:** cover nested objects, arrays, null values, missing properties, and type changes.
-- **Careful with data:** avoid logging full payloads or sensitive values by default; decide how before/after values should be exposed.
-- **Small and focused:** favor a clear core over an oversized feature set.
+- [Public API Reference](docs/api-reference.md): all functions, types, errors and troubleshooting.
+- [Report Format](docs/report-format.md) and [Change Model](docs/change-model.md).
+- [Clean Consumer Installation](docs/consumer-installation.md): actual tarball runtime and type checks.
+- [Release Notes](docs/release-notes-0.1.0.md), [Changelog](CHANGELOG.md) and [Versioning Policy](docs/versioning-policy.md).
+- [Publishing Guide](docs/publishing.md) and [First Release Checklist](docs/first-release-checklist.md): npm account setup, validation, publication and verification.
+- [Synthetic fixtures and runnable examples](https://github.com/codelovingcat/payload-watch/tree/main/examples).
+- [Historical MVP Scope](docs/mvp-scope.md), [Post-MVP Review](docs/post-mvp-review.md) and [GitHub Issues](https://github.com/codelovingcat/payload-watch/issues).
 
-## Versioning and changes
-
-See [Versioning and Release Policy](docs/versioning-policy.md) and [CHANGELOG](CHANGELOG.md). PayloadWatch is a **private `0.1.0` release candidate**, not yet published on npm. No stable API promise has been made.
-
-## First release candidate — not yet published
-
-The first npm version candidate is **`0.1.0`**, including the core JSON comparison API, optional `ignorePaths`, and the local `payload-watch` CLI. The package is still `private: true`: **do not run `npm install payload-watch` expecting this version to exist on npm yet**. From a checkout, use `npm ci && npm run build && npm run check:release-candidate`, along with the existing tests. See [0.1.0 Release Notes](docs/release-notes-0.1.0.md) and [First Release Checklist](docs/first-release-checklist.md). No `npm publish`, Git tag or GitHub Release has been created.
-
-## First npm release readiness
-
-Publication is not automatic. Review the [First Release Checklist](docs/first-release-checklist.md) and use `npm run release:preflight` to report local metadata blockers. The check does **not** publish and is expected to fail until an authorized release configuration is selected.
-
-## Development roadmap
-
-The GitHub Issues track the project from the first design decisions through testing and release preparation. The first 10 issues established the main workstreams; additional issues make the important technical and release tasks more explicit.
-
-The original core-only boundaries and acceptance criteria are preserved in the [historical MVP scope document](docs/mvp-scope.md). The **actual private `0.1.0` candidate** also includes the optional CLI and `ignorePaths` described in [release notes](docs/release-notes-0.1.0.md); historical scope exclusions are not a description of the current package.
-
-The input contract and public API direction are documented in [JSON Input Contract and Public API Proposal](docs/json-input-contract.md). The recursive `JsonValue` types and synchronous `comparePayloads` function are implemented, and arrays are compared deterministically by index. Runtime input validation is implemented under Issue #13 and documented in the JSON Input Contract.
-The change record types, JSON Pointer path rules, ordering, and opt-in value exposure are described in [Change Model and Path Format](docs/change-model.md). The index-by-index array policy is documented in [Array Comparison Policy](docs/array-comparison.md). The v0.1 decision to defer impact classification is documented in [Impact Classification Policy](docs/impact-classification-policy.md). The readable summary and data-exposure safeguards are described in [Report Format](docs/report-format.md).
-
-### Phase 1 — Scope and design
-
-- [#1 — Define the MVP scope and acceptance criteria](https://github.com/codelovingcat/payload-watch/issues/1)
-- [#3 — Define the JSON input contract and public comparison API](https://github.com/codelovingcat/payload-watch/issues/3)
-- [#4 — Design the change model and JSON path format](https://github.com/codelovingcat/payload-watch/issues/4)
-- [#11 — Specify equality, missing-field, and null semantics](https://github.com/codelovingcat/payload-watch/issues/11)
-- [#12 — Encode JSON paths safely for unusual property names](https://github.com/codelovingcat/payload-watch/issues/12)
-- [#13 — Validate inputs and report actionable errors](https://github.com/codelovingcat/payload-watch/issues/13)
-
-### Phase 2 — Build the core comparison engine
-
-- [#2 — Bootstrap the TypeScript package and test tooling](https://github.com/codelovingcat/payload-watch/issues/2)
-- [#5 — Implement recursive object and primitive comparisons](https://github.com/codelovingcat/payload-watch/issues/5)
-- [#6 — Define and implement deterministic array comparison](https://github.com/codelovingcat/payload-watch/issues/6)
-- [#7 — Define the impact-classification policy](https://github.com/codelovingcat/payload-watch/issues/7)
-- [#14 — Guarantee stable results and avoid mutating input payloads](https://github.com/codelovingcat/payload-watch/issues/14)
-
-### Phase 3 — Reports, examples, and tests
-
-- [#8 — Produce readable summaries and stable structured reports](https://github.com/codelovingcat/payload-watch/issues/8)
-- [#9 — Cover edge cases with a focused regression test suite](https://github.com/codelovingcat/payload-watch/issues/9)
-
-The core comparison regression cases and their expected behavior are tracked in [Regression Test Matrix](docs/regression-test-matrix.md). Run the automated suite from the repository root with `npm test`.
-
-The end-to-end local workflow and remaining package-release checks are documented in [Development Workflow](docs/development-workflow.md) and [Release Readiness](docs/release-readiness.md).
-- [#18 — Create realistic third-party API drift fixtures](https://github.com/codelovingcat/payload-watch/issues/18)
-- [#19 — Define safe handling of payload values in reports and errors](https://github.com/codelovingcat/payload-watch/issues/19)
-- [#20 — Measure behavior on large and deeply nested payloads](https://github.com/codelovingcat/payload-watch/issues/20)
-- [#24 — Write complete API reference and practical troubleshooting examples](https://github.com/codelovingcat/payload-watch/issues/24)
-- [#10 — Document the end-to-end workflow and validate package output](https://github.com/codelovingcat/payload-watch/issues/10)
-
-### Phase 4 — Package quality and release readiness
-
-- [#21 — Run build, tests, and type checks on GitHub Actions](https://github.com/codelovingcat/payload-watch/issues/21)
-- [#22 — Define package exports and TypeScript declaration output](https://github.com/codelovingcat/payload-watch/issues/22)
-- [#23 — Choose a license and document contribution expectations](https://github.com/codelovingcat/payload-watch/issues/23)
-- [#25 — Test the packed artifact from a clean consumer project](https://github.com/codelovingcat/payload-watch/issues/25)
-- [#26 — Define semantic versioning and changelog policy](https://github.com/codelovingcat/payload-watch/issues/26)
-- [#27 — Prepare and publish the first npm release](https://github.com/codelovingcat/payload-watch/issues/27)
-
-The [Post-MVP Review](docs/post-mvp-review.md) records which extensions have concrete evidence, where existing tools overlap, and which ideas remain unvalidated. It does not expand the first-release scope.
-
-### Phase 5 — Post-MVP developer experience (implemented extensions)
-
-These items were originally planned **after the core MVP**. CLI file comparison, JSON/text modes, exit codes and exact-path ignores have since been implemented and included in the private `0.1.0` candidate. Larger extensions remain subject to evidence and separate decisions.
-
-- [#15 — Add a CLI for comparing baseline and current JSON files](https://github.com/codelovingcat/payload-watch/issues/15)
-- [#16 — Add CLI output modes and CI-friendly exit codes](https://github.com/codelovingcat/payload-watch/issues/16)
-- [#17 — Support ignore paths for known volatile fields](https://github.com/codelovingcat/payload-watch/issues/17)
-- [#28 — Review post-MVP extensions and prioritize only validated needs](https://github.com/codelovingcat/payload-watch/issues/28)
-
-This roadmap records **development history**, not a list of unfinished features. Some originally post-MVP issues are completed and included in the current candidate; other ideas remain uncommitted. Only the private candidate scope and [release checklist](docs/first-release-checklist.md) determine what can be published.
-
-## Technology and development setup
-
-The initial development toolchain is configured as follows:
-
-- **Node.js 22.12 or newer** — the minimum runtime is set to meet Vitest 5's documented Node.js requirement.
-- **TypeScript 7** — compiles the source and runs strict type checks.
-- **Vitest 5** — runs the unit test suite.
-- **Vite 8** — installed explicitly because Vitest 5 uses Vite as a peer dependency.
-- **npm** — installs development dependencies and runs project scripts.
-
-The repository tracks a version-3 `package-lock.json`, and `npm ci` is used for reproducible installs. ESM package exports, generated declarations and clean archive-consumer tests are implemented and tested by CI on Node.js 22/24. The package is a private `0.1.0` release candidate with MIT licensing; public npm name and publish permissions must still be verified.
-
-### Prerequisites
-
-- Node.js 22.12.0 or newer.
-- npm (included with Node.js).
-
-### Get started
-
-Clone the repository and enter its directory, then run:
+From a checkout:
 
 ```bash
 npm ci
-npm run build
-npm run typecheck
-npm test
+npm run release:verify
 ```
 
-For watch mode while developing tests:
+This performs a clean build, type checks, unit/CLI/preflight tests, package/consumer checks, documented examples and release metadata validation. It does **not** publish. `npm run test:watch` and `npm run benchmark` are available for development. See [Development Workflow](docs/development-workflow.md).
 
-```bash
-npm run test:watch
-```
+TypeScript source is compiled to JavaScript and declarations for npm; there is no separate TypeScript registry. `prepack` builds the archive, and `prepublishOnly` runs verification before a manual directory-based `npm publish`. CI does not publish on merge. npm account access and the actual registry upload remain to be completed under [Issue #27](https://github.com/codelovingcat/payload-watch/issues/27).
 
-### Project structure
+## Contributing and license
 
-```text
-src/
-  index.ts             # Public API and type exports
-  json-value.ts        # Recursive JSON input types
-  json-input-validation.ts # Runtime JSON contract validation and typed errors
-  change-model.ts      # Structured change/report types
-  compare.ts           # Recursive object, array, and primitive comparison engine
-  json-pointer.ts      # Internal RFC 6901 path segment builder
-  report-format.ts     # Human-readable report formatter
-tests/
-  tooling.test.ts      # Initial test-runner smoke test
-  compare.test.ts      # Comparison-engine behavior tests
-  json-pointer.test.ts # Focused JSON Pointer path tests
-  regression.test.ts   # Focused JSON edge-case regression suite
-  comparison-semantics.test.ts # Explicit equality and null semantics tests
-  json-input-validation.test.ts # Runtime input validation and error tests
-  report-format.test.ts # Readable report formatting tests
-tsconfig.json          # Strict TypeScript compiler settings
-vitest.config.ts       # Node.js test configuration
-```
+Read [Contributing](https://github.com/codelovingcat/payload-watch/blob/main/CONTRIBUTING.md) and the [Code of Conduct](https://github.com/codelovingcat/payload-watch/blob/main/CODE_OF_CONDUCT.md). Report problems with synthetic inputs rather than customer data.
 
-The toolchain, recursive `JsonValue` types, structured change model, `comparePayloads` implementation, and runtime input validation are in place. The engine handles nested objects and arrays, primitive changes, additions/removals, type changes, deterministic traversal, and opt-in before/after values. The ESM package entry points and generated TypeScript declarations are already verified in the isolated consumer checks. No npm publication has taken place.
-
-
-## Contributing and project status
-
-PayloadWatch is an actively developed TypeScript-first learning and library project. Discussions and reproducible bug reports are welcome. Read [Contributing](CONTRIBUTING.md) for issue templates, local checks, pull-request expectations, and security-sensitive test data, and the [Code of Conduct](CODE_OF_CONDUCT.md) for collaboration standards.
-
-**License:** PayloadWatch is available under the [MIT License](LICENSE) (Copyright © 2026 codelovingcat). Reuse, modification, and commercial use are permitted under its terms; retain the copyright and license notice. The decision is recorded in [Licensing Decision](docs/licensing-decision.md). We welcome original contributions under the same license; see [Contributing](CONTRIBUTING.md).
-
-The `0.1.0` candidate is not published to npm and remains `private: true`. The current ESM package export, generated TypeScript declarations, and consumer checks are described in [Package Entry Points](docs/package-entrypoints.md); release requirements are tracked in [Release Readiness](docs/release-readiness.md).
-
----
-
-**PayloadWatch — know what changed in your API payloads, and where to look next.**
+[MIT License](LICENSE), Copyright © 2026 codelovingcat.

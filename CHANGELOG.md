@@ -4,9 +4,12 @@ Notable user-facing changes are recorded in [Keep a Changelog](https://keepachan
 
 ## [Unreleased]
 
-First candidate **0.1.0** is prepared, but **has not been published to npm**. Package metadata uses version `0.1.0` while `private: true` remains enabled. Date the release entry and create a tag only after explicit publication approval.
+First candidate **0.1.0** is prepared, but **has not been published to npm**. Package metadata uses version `0.1.0` with public registry/access configuration. The npm account and actual publication remain outstanding; finalize this entry on publication day and tag only after upload verification.
 
 ### Added
+
+- Application installation and JavaScript/TypeScript quick starts verified against the installed archive; bundled changelog and a step-by-step npm publishing guide.
+- Clean builds before packing and complete local verification before manual publication.
 
 - ESM-only Node.js JSON comparison library with synchronous `comparePayloads`, deterministic RFC 6901 paths and typed `ComparisonReport` results.
 - Added, removed, primitive value-changed and JSON type-changed records; nested objects and positional arrays; missing fields distinguished from explicit `null`.
@@ -18,6 +21,10 @@ First candidate **0.1.0** is prepared, but **has not been published to npm**. Pa
 - Unit, regression, CLI, npm archive and clean-consumer validation on Node.js 22 and 24.
 
 ### Fixed
+
+- Reject malformed UTF-8 CLI files, accept one leading UTF-8 BOM, and preserve BOM characters inside JSON strings.
+- Escape display controls in opt-in nested values, validation errors and CLI argument errors while preserving structured data.
+- Embed original TypeScript sources in packaged source maps for debugging installed packages.
 
 - Escape control characters and ambiguous literal backslashes in human-readable JSON Pointer paths to prevent injected terminal output. Structured report paths and JSON CLI output remain unchanged.
 
@@ -33,4 +40,4 @@ First candidate **0.1.0** is prepared, but **has not been published to npm**. Pa
 - `ignorePaths` can hide relevant changes; CLI fail-on-change means *any observed difference*, not a breaking-change classification.
 - The package does not fetch APIs, automatically redact JSON Pointer names, or determine application-specific impact.
 
-**Release gate:** npm name and publishing rights remain unverified; no npm tag, GitHub Release or npm publication has happened.
+**Release gate:** npm account and publishing rights remain unverified (the public name returned 404 during preparation; this does not reserve it); no npm tag, GitHub Release or npm publication has happened.

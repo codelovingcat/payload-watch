@@ -1,6 +1,6 @@
 # Post-MVP feature review and validation gate
 
-**Tracking:** [Issue #28](https://github.com/codelovingcat/payload-watch/issues/28). The table below records the **original evaluation decisions**; the subsequent release-scope update records what was actually included in the private, unpublished `0.1.0` candidate. Deferred candidates are not commitments.
+**Tracking:** [Issue #28](https://github.com/codelovingcat/payload-watch/issues/28). The table below records the **original evaluation decisions**; the subsequent release-scope update records what was actually included in the unpublished `0.1.0` candidate. Deferred candidates are not commitments.
 
 ## Evaluation evidence — October 2026
 
@@ -18,8 +18,8 @@ These alternatives were reviewed for **overlap and maintenance cost**, not claim
 | Candidate | Problem demonstrated | Estimated maintenance / new dependencies | Decision |
 | --- | --- | --- | --- |
 | Core JSON Pointer diagnostics and readable reports | Existing synthetic order examples show hard-to-find nested drift | Already in MVP | **Keep as primary focus** |
-| Optional local CLI, JSON output, exit codes | Manual before/after snapshot checks are tedious | Small surface, separate from pure core | **Originally approved as optional post-MVP** (#15 / #16); **now implemented and included** in the private `0.1.0` candidate |
-| Exact ignore paths | Request IDs and timestamps can mask useful changes | Medium risk of hidden meaningful drift | **Originally approved opt-in** (#17); **now implemented and included** in the private `0.1.0` candidate |
+| Optional local CLI, JSON output, exit codes | Manual before/after snapshot checks are tedious | Small surface, separate from pure core | **Originally approved as optional post-MVP** (#15 / #16); **now implemented and included** in the unpublished `0.1.0` candidate |
+| Exact ignore paths | Request IDs and timestamps can mask useful changes | Medium risk of hidden meaningful drift | **Originally approved opt-in** (#17); **now implemented and included** in the unpublished `0.1.0` candidate |
 | Identity-aware array matching | Inserting at index zero creates noisy positional comparisons | High complexity and ambiguous identity semantics | **Defer**, validate stable-key use case first |
 | JSON Schema / OpenAPI-aware contract impact | Need to know if a structural change breaks a particular consumer | High, existing tools solve parts of it | **Defer**, do not infer breaking behavior from two payloads |
 | Additional report renderers / editor integrations | Useful only if human-readable text is insufficient | Medium, interface fragmentation | **Explore only after user requests** |
@@ -41,7 +41,7 @@ Collect issue links, redacted reproduction cases and concrete acceptance criteri
 
 ## First release scope gate
 
-The v0.1 core remains the benchmark for release readiness. **The release-scope decision is now recorded:** the implemented local-file CLI and optional `ignorePaths` are included in the private `0.1.0` candidate, as documented in [Release Notes](release-notes-0.1.0.md). Their inclusion does not authorize npm publication or promise API stability before 1.0. Other proposed extensions remain deferred until actual user evidence supports a separate issue.
+The v0.1 core remains the benchmark for release readiness. **The release-scope decision is now recorded:** the implemented local-file CLI and optional `ignorePaths` are included in the unpublished `0.1.0` candidate, as documented in [Release Notes](release-notes-0.1.0.md). Their inclusion does not authorize npm publication or promise API stability before 1.0. Other proposed extensions remain deferred until actual user evidence supports a separate issue.
 
 **Review outcome:** Internal scenario review, candidate priorities, trade-offs and the feedback intake protocol are documented and executable. This completes the *planning* deliverable; **external adopter feedback remains uncollected** and must never be represented as validated demand. New feature decisions require real user evidence.
 
@@ -69,10 +69,10 @@ The GitHub Actions Node.js 22 and 24 matrix runs the same command. The script us
 
 ### Adoption feedback workflow
 
-Developers can use the [feedback issue template](../.github/ISSUE_TEMPLATE/developer-feedback.md) after trying the synthetic example or a locally sanitized sample. It asks what genuinely helped, what was misleading, whether arrays have stable identifiers, which exact paths are volatile, whether a CLI is useful, and which competing tool was considered. Never paste actual customer payloads, credentials or private log contents.
+Developers can use the [feedback issue template](https://github.com/codelovingcat/payload-watch/blob/main/.github/ISSUE_TEMPLATE/developer-feedback.md) after trying the synthetic example or a locally sanitized sample. It asks what genuinely helped, what was misleading, whether arrays have stable identifiers, which exact paths are volatile, whether a CLI is useful, and which competing tool was considered. Never paste actual customer payloads, credentials or private log contents.
 
 A maintained feedback ledger should link *actual* submitted issues and observed reproductions; until such feedback exists, do **not** claim external validation. The planning assessment can be complete while future adopter validation remains an explicit follow-on activity.
 
 ### Decision for the first release review
 
-Prioritize **no further post-MVP features** before the first public release. The CLI and `ignorePaths` have been explicitly included in the private `0.1.0` release candidate, with documented pre-1.0 limitations. Their removal would require a reviewed package/API change, not just altered wording. Keep schema-aware impact, identity-aware arrays and monitoring out of this initial release absent concrete validated demand.
+Prioritize **no further post-MVP features** before the first public release. The CLI and `ignorePaths` have been explicitly included in the unpublished `0.1.0` release candidate, with documented pre-1.0 limitations. Their removal would require a reviewed package/API change, not just altered wording. Keep schema-aware impact, identity-aware arrays and monitoring out of this initial release absent concrete validated demand.

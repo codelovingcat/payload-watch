@@ -6,6 +6,12 @@ import { fileURLToPath } from "node:url";
 export function inspectReleaseMetadata(pkg, lock, files) {
   const blockers = [];
   if (pkg.private !== false) blockers.push("Package remains private");
+  if (pkg.publishConfig?.access !== "public" || pkg.publishConfig?.registry !== "https://registry.npmjs.org/") {
+    blockers.push("Public npm registry/access configuration is missing or unexpected");
+  }
+  if (pkg.scripts?.prepack !== "npm run build" || pkg.scripts?.prepublishOnly !== "npm run release:verify") {
+    blockers.push("Build and validation lifecycle guards are missing");
+  }
   if (pkg.version === "0.0.0" || !/^[0-9]+\.[0-9]+\.[0-9]+(?:-[0-9A-Za-z.-]+)?$/.test(pkg.version ?? "")) {
     blockers.push("Deliberate release version is missing");
   }
