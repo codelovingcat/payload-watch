@@ -52,6 +52,11 @@ Plain records with either `Object.prototype` or a `null` prototype can represent
 
 Invalid input throws `InvalidJsonInputError`, a `TypeError` subclass exported from the package entry point. It exposes the input name (`previousPayload` or `currentPayload`), the offending `path` as a JSON Pointer (the empty string identifies the root), and a concise `reason`. The message does not serialize the offending value or the payload. Validation inspects property descriptors rather than reading accessor properties, so rejected getters are not executed. The implementation and tests are tracked in [Issue #13 — Validate inputs and report actionable errors](https://github.com/codelovingcat/payload-watch/issues/13).
 
+Human-readable validation messages escape terminal controls, Unicode line
+separators and bidirectional formatting marks in property paths. The error's
+`path` field remains the exact JSON Pointer, so display escaping does not change
+programmatic error handling.
+
 ## 4. Missing fields and null
 
 `null` is a valid JSON value. A missing object property is not itself a value: it is an absent key.

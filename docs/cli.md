@@ -32,6 +32,12 @@ For text output only, JSON Pointer paths are display-escaped: a key containing a
 
 **JSON output and the library's `ComparisonReport` retain the exact canonical RFC 6901 paths.** Use `--format json` in scripts; do not parse the human-readable summary as machine data. Display escaping does not redact potentially sensitive property names.
 
+Human-readable stderr messages also escape control characters and bidirectional
+formatting marks, including those in validation paths and unknown option
+arguments. An argument cannot insert extra stderr lines. The library's
+`InvalidJsonInputError.message` uses the same display protection; `error.path`
+retains the original JSON Pointer for programmatic use.
+
 ## Output contracts
 
 - **Default `--format text`**: the core `formatComparisonReport` human-readable summary, with a newline.
