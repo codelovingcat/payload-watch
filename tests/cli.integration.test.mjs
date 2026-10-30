@@ -26,6 +26,90 @@ function withMissingJsonFile(callback) {
   }
 }
 
+function withJsonBytes(previous, current, callback) {
+  const dir = mkdtempSync(join(tmpdir(), "payload-watch-encoding-"));
+  try {
+    const before = join(dir, "before.json");
+    const after = join(dir, "after.json");
+    writeFileSync(before, previous);
+    writeFileSync(after, current);
+    callback(before, after);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+}
+
+describe("CLI UTF-8 input contract", () => {
+  for (const input of ["previous", "current"]) {
+    it(`rejects malformed UTF-8 in the ${input} file without exposing its contents`, () => {
+      for (const bytes of [[0x80], [0xc3], [0xc0, 0xaf], [0xed, 0xa0, 0x80], [0xf4, 0x90, 0x80, 0x80], [0xf0, 0x9f]]) {
+        const invalid = Buffer.concat([
+          Buffer.from('{"secret":"private-encoding-value'), Buffer.from(bytes), Buffer.from('"}'),
+        ]);
+        const valid = '{"secret":"valid"}';
+        withJsonBytes(input === "previous" ? invalid : valid, input === "current" ? invalid : valid, (before, after) => {
+          const p = run("compare", "--format=json", "--fail-on-change", before, after);
+          assert.equal(p.status, 2);
+          assert.equal(p.stdout, "");
+          assert.equal(p.stderr, `payload-watch: Invalid UTF-8 in ${input} file\n`);
+        });
+      }
+    });
+  }
+
+  it("does not turn two differently corrupted documents into an unchanged comparison", () => {
+    const malformed = byte => Buffer.concat([Buffer.from('{"id":"'), Buffer.from([byte]), Buffer.from('"}')]);
+    withJsonBytes(malformed(0x80), malformed(0x81), (before, after) => {
+      const p = run("compare", "--fail-on-change", before, after);
+      assert.equal(p.status, 2);
+      assert.equal(p.stdout, "");
+      assert.match(p.stderr, /Invalid UTF-8 in previous file/);
+    });
+  });
+
+  it("accepts one leading UTF-8 BOM in either or both inputs", () => {
+    for (const [beforeBom, afterBom] of [[true, false], [false, true], [true, true]]) {
+      withJsonBytes(`${beforeBom ? "\ufeff" : ""}{"id":1}`, `${afterBom ? "\ufeff" : ""}{"id":2}`, (before, after) => {
+        const p = run("compare", "--format=json", "--fail-on-change", before, after);
+        assert.equal(p.status, 1, p.stderr);
+        assert.equal(p.stderr, "");
+        assert.deepEqual(JSON.parse(p.stdout).changes, [
+          { kind: "value-changed", path: "/id", previousType: "number", currentType: "number" },
+        ]);
+        const same = run("compare", "--fail-on-change", after, after);
+        assert.equal(same.status, 0, same.stderr);
+      });
+    }
+  });
+
+  it("preserves U+FEFF within JSON strings and ordinary Unicode text", () => {
+    withJsonBytes('\ufeff{"value":"İstanbul 雪 😀\ufeff"}', '{"value":"İstanbul 雪 😀"}', (before, after) => {
+      const p = run("compare", "--format=json", "--fail-on-change", before, after);
+      assert.equal(p.status, 1, p.stderr);
+      assert.deepEqual(JSON.parse(p.stdout).changes.map(c => c.path), ["/value"]);
+    });
+  });
+
+  it("does not remove a second BOM from the JSON document", () => {
+    withJsonBytes("{}", "\ufeff\ufeff{}", (before, after) => {
+      const p = run("compare", before, after);
+      assert.equal(p.status, 2);
+      assert.equal(p.stdout, "");
+      assert.match(p.stderr, /Invalid JSON in current file/);
+    });
+  });
+
+  it("rejects UTF-16 input", () => {
+    const utf16 = Buffer.concat([Buffer.from([0xff, 0xfe]), Buffer.from('{"id":1}', "utf16le")]);
+    withJsonBytes("{}", utf16, (before, after) => {
+      const p = run("compare", before, after);
+      assert.equal(p.status, 2);
+      assert.equal(p.stdout, "");
+      assert.equal(p.stderr, "payload-watch: Invalid UTF-8 in current file\n");
+    });
+  });
+});
+
 describe("file comparison CLI", () => {
   it("prints documented help", () => {
     const p = run("--help");

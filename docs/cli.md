@@ -17,6 +17,15 @@ payload-watch compare [--format text|json] [--fail-on-change] <previous.json> <c
 
 Options may occur before or after file paths. `--format=json` works as well as `--format json`. `--help` prints usage. Stdin is not supported.
 
+### File encoding
+
+Input files must contain valid UTF-8. One optional UTF-8 BOM at the start of each
+file is accepted; U+FEFF within a JSON string remains part of the value. A second
+leading BOM is not JSON whitespace and is rejected. UTF-16 files and malformed or
+truncated UTF-8 sequences are rejected with exit code `2` and a concise stderr
+message identifying the previous or current input, without echoing payload text
+or filesystem paths. Invalid bytes are never silently replaced before comparison.
+
 ### Unusual key names and safe text output
 
 For text output only, JSON Pointer paths are display-escaped: a key containing a literal newline, carriage return, tab or ESC cannot insert another report line or terminal control sequence. For example, a key containing `line` + newline + `break` displays as `/line\nbreak`. Literal backslashes are doubled. Other control characters appear as `\uXXXX`.
