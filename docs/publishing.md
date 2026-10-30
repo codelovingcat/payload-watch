@@ -2,13 +2,13 @@
 
 PayloadWatch is a TypeScript-authored **npm package**. npm distributes compiled ESM JavaScript, `.d.ts` declarations, embedded-source maps, the CLI, documentation and the MIT license. Consumers install one package; there is no separate TypeScript registry.
 
-## Current release state
+## Release configuration
 
 - Name/version: `payload-watch@0.1.0`, public, MIT, Node.js 22.12+ / ESM.
 - `private: false` and `publishConfig` select public access and `https://registry.npmjs.org/`. They permit a release; they do not upload it.
 - `prepack` performs a clean build. `prepublishOnly` runs `npm run release:verify` before a directory-based publish. Archive checks use `--ignore-scripts` internally to avoid recursive lifecycle execution.
 - CI validates pull requests and main; it has no publish step or npm credentials.
-- **Not published yet.** During preparation on 2026-10-30, the public registry returned 404 for `payload-watch`; the working environment had no authenticated npm account. A 404 does not reserve the name or prove an account may claim it.
+- Check the registry and the publication record in Issue #27 for the current status. Account authentication, publication and registry-consumer checks are separate from repository preparation. A registry 404 does not reserve a package name.
 
 [Issue #27](https://github.com/codelovingcat/payload-watch/issues/27) stays open until publication and registry-consumer verification are recorded.
 

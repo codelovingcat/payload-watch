@@ -2,7 +2,7 @@
 
 **Tracking issue:** [#24 — API reference and troubleshooting](https://github.com/codelovingcat/payload-watch/issues/24)
 
-This reference describes the **currently implemented** ESM-only API from `src/index.ts`. The project is not yet published on npm; use a source checkout or a locally installed package archive for now. The **core library** does not fetch APIs, capture snapshots, read files, run CLI commands or persist data. A separate, optional local-file [CLI](cli.md) is included in this candidate.
+This reference describes the **currently implemented** ESM-only API from `src/index.ts`. Install the compiled package with `npm install payload-watch@0.1.0`, or use a locally packed archive for development. The **core library** does not fetch APIs, capture snapshots, read files, run CLI commands or persist data. A separate, optional local-file [CLI](cli.md) is included in this candidate.
 
 ## Setup
 
@@ -212,13 +212,13 @@ After `npm ci && npm run build`, compare caller-provided JSON files locally:
 node bin/payload-watch.mjs compare --format=json --fail-on-change examples/order-payloads/baseline.json examples/order-payloads/current.json
 ```
 
-The `payload-watch compare` executable supports `--format text|json` (also `--format=json`), `--fail-on-change`, and `--help`. Exit code **0** means successful comparison (unless fail-on-change is enabled), **1** means observed differences **with** `--fail-on-change`, and **2** indicates invalid arguments or file/JSON/input errors. The core `comparePayloads` library **does not** read files or send network requests. See [CLI Usage](cli.md) for precise syntax and output contracts. This unpublished release candidate can be used from a checkout or a locally packed archive, not yet by installing a public registry version.
+The `payload-watch compare` executable supports `--format text|json` (also `--format=json`), `--fail-on-change`, and `--help`. Exit code **0** means successful comparison (unless fail-on-change is enabled), **1** means observed differences **with** `--fail-on-change`, and **2** indicates invalid arguments or file/JSON/input errors. The core `comparePayloads` library **does not** read files or send network requests. See [CLI Usage](cli.md) for precise syntax and output contracts. The executable is included in the installed npm package and in locally packed archives.
 
 ## 5. Troubleshooting
 
 | Symptom | Check / remedy |
 | --- | --- |
-| Import fails with `ERR_MODULE_NOT_FOUND` or a missing `dist/index.js`. | This repository is not yet on npm; build with `npm ci && npm run build`. Use `../dist/index.js` in the checked-in example, or install a locally packed artifact in an external project. ESM imports require a compatible Node.js runtime. |
+| Import fails with `ERR_MODULE_NOT_FOUND` or a missing `dist/index.js`. | Install `payload-watch` in the application and use its package-root import. For a source checkout, build with `npm ci && npm run build`; checked-in examples use `../dist/index.js`. ESM imports require a compatible Node.js runtime. |
 | TypeScript cannot find the module or exported types. | Run the build to create `dist/index.d.ts`. Use the package root import and TypeScript NodeNext-compatible resolution; do not import private internal subpaths. Check [Package Entry Points](package-entrypoints.md). |
 | `InvalidJsonInputError` from an input. | Inspect `error.input`, `error.path`, and `error.reason`, not the entire payload. Remove `undefined`, `NaN`, cycles, sparse arrays or JS-only objects; use plain JSON values. |
 | The report shows a single root-level type change. | Root types differ (for example a string of JSON text versus an object). If the input is JSON text, use `JSON.parse` before comparing. `""` is the root pointer. |
@@ -236,6 +236,6 @@ The `payload-watch compare` executable supports `--format text|json` (also `--fo
 - **No schema inference, HTTP fetching, watch mode, or durable snapshot storage** in the core library. Opt-in exact `ignorePaths` and the separate local-file CLI are included in the `0.1.0` candidate.
 - **No general automatic redaction:** use the default value-free report, or safely handle opt-in values and JSON Pointer paths.
 - **Synchronous and recursive:** nesting is limited to 512 levels from root depth 0; excessive depth is rejected with a typed error. There is no guaranteed maximum byte size or performance SLA.
-- **Distribution not complete:** this is ESM-only, Node.js 22.12+, and **not yet published**. The repository is [MIT licensed](../LICENSE), though the `0.1.0` candidate is not yet published to npm.
+- **Runtime support:** ESM-only, Node.js 22.12+; no separately tested CommonJS or browser build. The package is [MIT licensed](../LICENSE).
 
 The executable examples and their expected output are checked in CI through `node examples/api-reference.mjs`, while Vitest covers the same comparison semantics independently of build output.

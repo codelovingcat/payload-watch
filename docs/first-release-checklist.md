@@ -1,6 +1,6 @@
 # First npm release — 0.1.0
 
-**Tracking:** [Issue #27](https://github.com/codelovingcat/payload-watch/issues/27). **Status:** prepared for publication; not published.
+**Tracking:** [Issue #27](https://github.com/codelovingcat/payload-watch/issues/27). **Publication evidence:** the issue records the exact commit, authenticated upload and registry verification. This document is the release procedure, not a registry-status assertion.
 
 The first release includes the synchronous ESM comparison library, generated TypeScript declarations, runtime validation, structured/readable reports, exact `ignorePaths` and the local-file CLI. Node.js 22.12+ is required. Arrays are positional; no live monitoring or automatic breaking-change classification is included.
 
@@ -18,7 +18,7 @@ The first release includes the synchronous ESM comparison library, generated Typ
 
 - [ ] Confirm the exact final release commit has passing CI and `npm run release:verify`.
 - [ ] Authenticate the intended npm account and verify package name/rights. Registry 404 during preparation is not a reservation.
-- [ ] Finalize the README status and dated changelog on the actual publication day; review the exact tarball, metadata and license.
+- [x] Prepare README installation instructions and the 2026-10-31 changelog entry for 0.1.0. Review the exact tarball, metadata and license before uploading.
 - [ ] Run a directory-based `npm publish --dry-run`, then the authorized actual publication.
 - [ ] Install the registry version in a fresh project and verify JavaScript, TypeScript and CLI usage.
 - [ ] Record npm URL, source commit, integrity, tag `v0.1.0` and GitHub Release in Issue #27; close it after completion.

@@ -4,13 +4,14 @@ Notable user-facing changes are recorded in [Keep a Changelog](https://keepachan
 
 ## [Unreleased]
 
-First candidate **0.1.0** is prepared, but **has not been published to npm**. Package metadata uses version `0.1.0` with public registry/access configuration. The npm account and actual publication remain outstanding; finalize this entry on publication day and tag only after upload verification.
+## [0.1.0] - 2026-10-31
+
+First release: JSON payload comparison for Node.js applications, TypeScript declarations and the local-file CLI.
 
 ### Added
 
 - Application installation and JavaScript/TypeScript quick starts verified against the installed archive; bundled changelog and a step-by-step npm publishing guide.
 - Clean builds before packing and complete local verification before manual publication.
-
 - ESM-only Node.js JSON comparison library with synchronous `comparePayloads`, deterministic RFC 6901 paths and typed `ComparisonReport` results.
 - Added, removed, primitive value-changed and JSON type-changed records; nested objects and positional arrays; missing fields distinguished from explicit `null`.
 - Runtime validation via `InvalidJsonInputError`, with path-aware diagnostics that do not echo payload values.
@@ -25,7 +26,6 @@ First candidate **0.1.0** is prepared, but **has not been published to npm**. Pa
 - Reject malformed UTF-8 CLI files, accept one leading UTF-8 BOM, and preserve BOM characters inside JSON strings.
 - Escape display controls in opt-in nested values, validation errors and CLI argument errors while preserving structured data.
 - Embed original TypeScript sources in packaged source maps for debugging installed packages.
-
 - Escape control characters and ambiguous literal backslashes in human-readable JSON Pointer paths to prevent injected terminal output. Structured report paths and JSON CLI output remain unchanged.
 
 ### Changed
@@ -39,5 +39,3 @@ First candidate **0.1.0** is prepared, but **has not been published to npm**. Pa
 - Arrays compare by index only, without move detection, identity-aware matching, schema compatibility verdicts or API snapshot capture.
 - `ignorePaths` can hide relevant changes; CLI fail-on-change means *any observed difference*, not a breaking-change classification.
 - The package does not fetch APIs, automatically redact JSON Pointer names, or determine application-specific impact.
-
-**Release gate:** npm account and publishing rights remain unverified (the public name returned 404 during preparation; this does not reserve it); no npm tag, GitHub Release or npm publication has happened.

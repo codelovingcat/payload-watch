@@ -16,7 +16,7 @@ MIT does **not** include an express patent grant equivalent to Apache-2.0. The a
 - Contributions should be original or legally redistributable under MIT; see [CONTRIBUTING.md](https://github.com/codelovingcat/payload-watch/blob/main/CONTRIBUTING.md).
 - A lightweight [Code of Conduct](https://github.com/codelovingcat/payload-watch/blob/main/CODE_OF_CONDUCT.md) applies to project discussions.
 - The local npm archive must contain the correct LICENSE file along with compiled JavaScript and TypeScript declarations. `npm run check:package` enforces the archive contract in CI.
-- The `0.1.0` candidate is configured for public npm distribution but **not published to npm**. The MIT repository license and the npm release decision are separate.
+- The `0.1.0` package uses public npm distribution metadata. The MIT repository license and each npm release decision are separate.
 
 ## Verification
 

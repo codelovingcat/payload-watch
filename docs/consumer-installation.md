@@ -4,7 +4,7 @@
 
 ## Goal and scope
 
-Validate the **actual .tgz archive** npm installs, separate from the repository's `src/` files. This is a release-readiness test, not an npm publication. The candidate version is `0.1.0`; public publication metadata is configured. No npm publication has happened.
+Validate the **actual .tgz archive** npm installs, separate from the repository's `src/` files. This is a release-readiness test, not an npm publication. These archive checks are separate from registry installation checks; the first-release registry evidence is recorded in [Issue #27](https://github.com/codelovingcat/payload-watch/issues/27).
 
 ## From a fresh checkout
 

@@ -45,8 +45,8 @@ npm run check:package
 
 The CI workflow runs this after build, type-check and unit tests on both Node.js 22 and 24. Confirm that both GitHub jobs pass on the PR; writing metadata alone does not establish a working artifact.
 
-## Published archive policy and remaining release work
+## Published archive policy
 
 The `files` allowlist deliberately includes generated `dist/` output, documentation, `CHANGELOG.md`, and the optional `bin/` CLI. npm also includes `package.json` and the root MIT `LICENSE`; the package check requires both. Test files, example fixtures, source-only files, environment files and build scripts are not intended to ship. Build output is ignored by Git but included in `npm pack` after compilation.
 
-The package is a **unpublished `0.1.0` release candidate**. Both the initial archive check ([Issue #22](https://github.com/codelovingcat/payload-watch/issues/22)) and the fuller clean-consumer compatibility review ([Issue #25](https://github.com/codelovingcat/payload-watch/issues/25)) have been implemented and merged. The optional CLI is included under `bin/`; the library API uses the package root export. The MIT license and versioning policy are also in place. **Remaining gate:** verified npm package-name ownership, maintainer publication approval, and final published-artifact verification ([Issue #27](https://github.com/codelovingcat/payload-watch/issues/27)). Local packaging checks never publish.
+Version `0.1.0` uses the package-root ESM import described above. Both the initial archive check ([Issue #22](https://github.com/codelovingcat/payload-watch/issues/22)) and the fuller clean-consumer compatibility review ([Issue #25](https://github.com/codelovingcat/payload-watch/issues/25)) have been implemented and merged. The optional CLI is included under `bin/`; the library API uses the package root export. The MIT license and versioning policy are also in place. **Publication record:** npm package identity, authorized upload and independently installed registry verification ([Issue #27](https://github.com/codelovingcat/payload-watch/issues/27)). Local packaging checks never publish.

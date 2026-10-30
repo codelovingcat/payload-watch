@@ -52,7 +52,7 @@
     "registry": "https://registry.npmjs.org/"
   },
   "bin": {
-    "payload-watch": "./bin/payload-watch.mjs"
+    "payload-watch": "bin/payload-watch.mjs"
   },
   "repository": {
     "type": "git",
