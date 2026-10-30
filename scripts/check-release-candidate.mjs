@@ -26,7 +26,7 @@ assert.equal(pkg.main, "./dist/index.js");
 assert.equal(pkg.types, "./dist/index.d.ts");
 assert.equal(pkg.exports["."].types, "./dist/index.d.ts");
 assert.equal(pkg.exports["."].import, "./dist/index.js");
-assert.equal(pkg.bin["payload-watch"], "./bin/payload-watch.mjs");
+assert.equal(pkg.bin["payload-watch"], "bin/payload-watch.mjs");
 
 assert.equal(lock.name, pkg.name);
 assert.equal(lock.version, pkg.version);
