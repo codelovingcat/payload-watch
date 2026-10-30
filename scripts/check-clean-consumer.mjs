@@ -84,6 +84,30 @@ try {
     assert.ok(!existsSync(join(installed, unwanted)), `Source-only path leaked: ${unwanted}`);
   }
 
+  const javascriptPaths = actualPaths.filter(path => path.startsWith("dist/") && path.endsWith(".js"));
+  assert.ok(javascriptPaths.length > 0, "No compiled JavaScript to inspect");
+  for (const javascriptPath of javascriptPaths) {
+    const mapPath = `${javascriptPath}.map`;
+    assert.ok(actualPaths.includes(mapPath), `Missing source map: ${mapPath}`);
+    const javascript = readFileSync(join(installed, javascriptPath), "utf8");
+    assert.ok(javascript.includes(`//# sourceMappingURL=${mapPath.split("/").at(-1)}`),
+      `JavaScript does not reference its source map: ${javascriptPath}`);
+    const map = JSON.parse(readFileSync(join(installed, mapPath), "utf8"));
+    assert.equal(map.version, 3, `Unexpected source map version: ${mapPath}`);
+    assert.ok(Array.isArray(map.sources) && map.sources.length > 0, `Missing sources: ${mapPath}`);
+    assert.ok(Array.isArray(map.sourcesContent), `Missing embedded source content: ${mapPath}`);
+    assert.equal(map.sourcesContent.length, map.sources.length, `Incomplete source content: ${mapPath}`);
+    for (const [index, source] of map.sources.entries()) {
+      assert.equal(typeof source, "string", `Invalid source path: ${mapPath}`);
+      assert.ok(source.startsWith("../src/"), `Unexpected source path: ${mapPath}`);
+      const embedded = map.sourcesContent[index];
+      assert.equal(typeof embedded, "string", `Missing embedded source: ${mapPath}`);
+      assert.ok(embedded.length > 0, `Empty embedded source: ${mapPath}`);
+      const original = resolve(dirname(join(root, mapPath)), source);
+      assert.equal(embedded, readFileSync(original, "utf8"), `Embedded source differs from checkout: ${mapPath}`);
+    }
+  }
+
   const runtime = [
     'import assert from "node:assert/strict";',
     'import { fileURLToPath } from "node:url";',

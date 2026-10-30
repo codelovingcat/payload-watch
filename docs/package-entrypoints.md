@@ -8,6 +8,14 @@ PayloadWatch currently targets **ES modules (ESM only)** on Node.js **22.12.0 or
 
 Package metadata maps the public entry point to `./dist/index.js` for JavaScript and `./dist/index.d.ts` for TypeScript using `main`, `types`, and `exports`. `tsconfig.json` enables `declaration`, so the regular build produces `.d.ts` files for the public entry point and its referenced internal modules. The ESM import surface is the exports from `src/index.ts` only.
 
+JavaScript source maps embed the original TypeScript text in `sourcesContent`
+(`sourceMap` and `inlineSources` are enabled). A debugger can display those
+sources after installing the tarball even though the `src/` directory itself is
+not distributed. This deliberately includes library source text in the maps;
+tests, fixtures and environment files remain excluded. `npm run check:consumer`
+inspects maps from the actual installed archive and verifies embedded content
+against the checkout, alongside its runtime and type-resolution checks.
+
 ```js
 import { comparePayloads, formatComparisonReport } from "payload-watch";
 const result = comparePayloads({ id: 1 }, { id: "1" });
