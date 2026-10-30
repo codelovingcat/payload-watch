@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { readFile } from "node:fs/promises";
+import { TextDecoder } from "node:util";
 import { comparePayloads, formatComparisonReport, InvalidJsonInputError } from "../dist/index.js";
 
 const USAGE = "Usage: payload-watch compare [--format text|json] [--fail-on-change] <previous.json> <current.json>";
@@ -38,12 +39,20 @@ function parse(argv) {
   return { format, failOnChange, paths };
 }
 async function loadJson(path, label) {
-  let text;
+  let bytes;
   try {
-    text = await readFile(path, "utf8");
+    bytes = await readFile(path);
   } catch (error) {
     const code = typeof error?.code === "string" ? error.code : "IO_ERROR";
     throw new Error("Cannot read " + label + " file (" + code + ")");
+  }
+  let text;
+  try {
+    // Fatal decoding rejects malformed UTF-8. The default BOM handling consumes
+    // one leading UTF-8 BOM without removing U+FEFF inside JSON strings.
+    text = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
+  } catch {
+    throw new Error("Invalid UTF-8 in " + label + " file");
   }
   try { return JSON.parse(text); }
   catch { throw new Error("Invalid JSON in " + label + " file"); }
