@@ -4,7 +4,7 @@
 
 PayloadWatch is a synchronous TypeScript/JavaScript library and an optional local-file CLI. It reports added or removed fields, primitive value changes and type changes, including nested objects and arrays. It has **no runtime dependencies** and does not fetch, store or transmit your payloads.
 
-> **Release status:** `0.1.0` is prepared for public npm distribution but **not yet published**. Until publication is confirmed in [Issue #27](https://github.com/codelovingcat/payload-watch/issues/27), install a local archive as described below. The API is pre-1.0 and may change.
+> **Version 0.1.0:** Node.js 22.12+ / ESM, with built-in TypeScript declarations. The API is pre-1.0 and may change. See [release notes](docs/release-notes-0.1.0.md) and the [npm package](https://www.npmjs.com/package/payload-watch).
 
 ## Requirements and compatibility
 
@@ -20,9 +20,17 @@ Use the public package root, `payload-watch`, rather than internal `dist/` subpa
 
 ## Installation
 
-### Use the candidate now
+In your application's directory:
 
-Build an installable archive from a checkout:
+```bash
+npm install payload-watch@0.1.0
+```
+
+JavaScript and TypeScript applications install the same package. It includes compiled code, declarations and the optional `payload-watch` executable; consumers do not need this repository's compiler or test tools.
+
+### Install a source checkout as an archive
+
+For local development or evaluating an unreleased change:
 
 ```bash
 git clone https://github.com/codelovingcat/payload-watch.git
@@ -31,21 +39,11 @@ npm ci
 npm pack
 ```
 
-`npm pack` runs the build automatically and creates `payload-watch-0.1.0.tgz`. In **your application's directory**, install that file, substituting its actual absolute path:
+`npm pack` builds automatically and creates `payload-watch-0.1.0.tgz`. In your application's directory, substitute the real path:
 
 ```bash
 npm install /absolute/path/to/payload-watch-0.1.0.tgz
 ```
-
-### After the first npm publication
-
-Once the registry version exists, applications can install it directly:
-
-```bash
-npm install payload-watch@0.1.0
-```
-
-The registry command is not available for this version until publication completes. The local archive provides the same public imports today.
 
 ## JavaScript quick start
 
@@ -167,7 +165,7 @@ See [JSON Input Contract](docs/json-input-contract.md), [Ignore Paths](docs/igno
 
 ## Local-file CLI
 
-After installing the archive (or, after publication, the registry package), compare two UTF-8 JSON files from your application:
+After installing the package, compare two UTF-8 JSON files from your application:
 
 ```bash
 npx --no-install payload-watch compare previous.json current.json
@@ -214,7 +212,7 @@ npm run release:verify
 
 This performs a clean build, type checks, unit/CLI/preflight tests, package/consumer checks, documented examples and release metadata validation. It does **not** publish. `npm run test:watch` and `npm run benchmark` are available for development. See [Development Workflow](docs/development-workflow.md).
 
-TypeScript source is compiled to JavaScript and declarations for npm; there is no separate TypeScript registry. `prepack` builds the archive, and `prepublishOnly` runs verification before a manual directory-based `npm publish`. CI does not publish on merge. npm account access and the actual registry upload remain to be completed under [Issue #27](https://github.com/codelovingcat/payload-watch/issues/27).
+TypeScript source is compiled to JavaScript and declarations for npm; there is no separate TypeScript registry. `prepack` builds the archive, and `prepublishOnly` runs verification before a manual directory-based `npm publish`. CI does not publish on merge. The first-release publication and verification record is tracked in [Issue #27](https://github.com/codelovingcat/payload-watch/issues/27).
 
 ## Contributing and license
 

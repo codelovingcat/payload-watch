@@ -1,8 +1,14 @@
-# PayloadWatch 0.1.0 — first-release candidate notes
+# PayloadWatch 0.1.0 — release notes
 
-**Status: NOT PUBLISHED.** This describes a proposed first public npm release, not an existing registry version. `package.json` and `package-lock.json` use `0.1.0`, and `private: false` permits the planned public release. No publish, public tag or GitHub Release has occurred.
+**Release version:** `0.1.0` · **Date:** 2026-10-31 · **License:** MIT.
 
-## Candidate functionality
+```bash
+npm install payload-watch@0.1.0
+```
+
+Use `import { comparePayloads, formatComparisonReport } from "payload-watch"` in a Node.js 22.12+ ESM application. TypeScript declarations and the CLI are included. See the [README](../README.md) for complete runnable examples.
+
+## Included functionality
 
 - Compare two caller-provided JSON values using `comparePayloads`; report added, removed, value-changed and type-changed locations using RFC 6901 JSON Pointers.
 - Deterministic nested object traversal, arrays by index, and distinction between missing fields and explicit `null`.
@@ -25,7 +31,7 @@
 - Core library does not fetch APIs, persist response snapshots, handle credentials or monitor network services.
 - Ignore rules can conceal significant drift; default value omission does not automatically redact JSON Pointer property names.
 
-## Candidate verification (never publishes)
+## Source verification (never publishes)
 
 ```bash
 npm ci
@@ -40,12 +46,8 @@ node scripts/verify-post-mvp-scenarios.mjs
 npm pack --dry-run --json
 ```
 
-Actual public distribution requires a separate maintainer approval of the npm package name, scope, permissions, artifact, privacy, and 2FA/authentication. The metadata-only `release:preflight` now checks public registry/access settings and build/verification hooks; it does not authenticate or publish. See [First Release Checklist](first-release-checklist.md).
+The metadata-only `release:preflight` checks package configuration; it does not authenticate or publish. For the release procedure see [Publishing Guide](publishing.md).
 
-To test an actual local archive, run `npm pack --ignore-scripts` and install the resulting `.tgz` file into a separate project. That is not the same as downloading a published version using npm.
+## Publication record
 
-## Record only after successful, explicitly authorized publication
-
-- Actual npm package URL, published version and exact publication date
-- Confirmed Git tag `v0.1.0`, GitHub release page and source commit
-- Independent install verification of the publicly published tarball
+The npm package page is [payload-watch](https://www.npmjs.com/package/payload-watch). The exact source commit, registry integrity, independently installed-package verification, Git tag and GitHub Release are recorded in [Issue #27](https://github.com/codelovingcat/payload-watch/issues/27) after publication succeeds.
