@@ -88,7 +88,18 @@ formatComparisonReport(report);
 formatComparisonReport(report, { includeValues: true });
 ```
 
-**Exact-path ignores:** `comparePayloads` also accepts `{ ignorePaths: ["/metadata/requestId"] }`, which suppresses selected RFC 6901 paths and descendants. Such filtering can hide meaningful changes; see [Ignore Paths](ignore-paths.md).
+**Exact-path ignores:** `comparePayloads` accepts `{ ignorePaths: ["/metadata/requestId"] }`. Each rule is an **exact RFC 6901 JSON Pointer** (including escaped `~0` for `~` and `~1` for `/`); it excludes the selected path and every descendant. Matching respects path segments: `/id` does not match `/identity`. The empty pointer `""` deliberately suppresses all differences. There are no wildcards or regular expressions, and a descendant rule does not suppress an otherwise reported type change at an ancestor.
+
+```js
+const report = comparePayloads(
+  { meta: { requestId: "old", status: "ready" } },
+  { meta: { requestId: "new", status: "failed" } },
+  { ignorePaths: ["/meta/requestId"] },
+);
+// report.changes contains only the change at /meta/status.
+```
+
+Invalid input types, malformed pointers and duplicate rules throw `TypeError`. Rules can hide changes important to a particular consumer; use narrow, reviewed paths. `ignorePaths` does not mutate inputs, nor does it affect `includeValues`' privacy default. See [Ignore Paths](ignore-paths.md).
 
 **Privacy:** even when the text output hides values, the `report` above **already contains** `old-secret` and `new-secret`. Avoid logging or distributing such reports without an appropriate redaction and access policy. A formatter-only opt-in cannot retrieve values absent from the report. JSON Pointer paths themselves may contain sensitive *property names*. See [Privacy and Data Handling](privacy-and-data-handling.md).
 
@@ -136,7 +147,7 @@ These are **type-only exports** from `"payload-watch"`; they are not runtime Jav
 | `ValueChangedChange` | `kind: "value-changed"`, `previousType`, `currentType`, optional primitive before/after values. |
 | `TypeChangedChange` | `kind: "type-changed"`, `previousType`, `currentType`, optional before/after JSON values. |
 | `PayloadChange` | Discriminated union of the four change record types. |
-| `CompareOptions` | `readonly includeValues?: boolean` (default `false`). |
+| `CompareOptions` | `readonly includeValues?: boolean` (default `false`); `readonly ignorePaths?: readonly JsonPointer[]` (optional). Exact RFC 6901 pointers suppress selected paths and their subtrees; invalid or duplicate rules throw `TypeError`. |
 | `FormatOptions` | `readonly includeValues?: boolean` (default `false`). |
 | `ComparisonReport` | `readonly changes: readonly PayloadChange[]`. |
 
@@ -188,6 +199,16 @@ This reports **seven paths**, in order:
 ```
 
 The renamed-looking customer field appears as **one added and one removed key**; the library cannot infer that a rename was intentional. The added item is reported as one added object at `/items/2`, not a list of every new field. This example uses local fixture files loaded by the *caller*: the library does not fetch the data. To execute a working version from the repository checkout, run `node examples/api-reference.mjs` after building.
+
+### Optional local CLI (separate from the synchronous library)
+
+After `npm ci && npm run build`, compare caller-provided JSON files locally:
+
+```bash
+node bin/payload-watch.mjs compare --format=json --fail-on-change examples/order-payloads/baseline.json examples/order-payloads/current.json
+```
+
+The `payload-watch compare` executable supports `--format text|json` (also `--format=json`), `--fail-on-change`, and `--help`. Exit code **0** means successful comparison (unless fail-on-change is enabled), **1** means observed differences **with** `--fail-on-change`, and **2** indicates invalid arguments or file/JSON/input errors. The core `comparePayloads` library **does not** read files or send network requests. See [CLI Usage](cli.md) for precise syntax and output contracts. This unpublished release candidate can be used from a checkout or a locally packed archive, not yet by installing a public registry version.
 
 ## 5. Troubleshooting
 
