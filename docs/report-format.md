@@ -65,6 +65,14 @@ Literal backslashes are doubled (`\` displays as `\\`), LF/CR/tab appear as `\n`
 
 Ordinary paths such as `/customer/name` and the display-only `<root>` marker are unchanged. This hardening does not redact sensitive property names, so avoid placing confidential identifiers in logged paths.
 
+Opt-in string values and nested object keys use JSON escaping followed by the
+same control-character protection. C1 controls, Unicode line separators and
+bidirectional controls (including U+061C, U+200E and U+200F) appear as `\uXXXX`.
+Literal backslashes remain distinguishable from escaped controls; rendered
+values remain valid JSON with their original meaning. Ordinary Unicode text,
+including non-ASCII names and emoji, is preserved. The structured report is not
+modified by display escaping.
+
 ## Value-exposure policy
 
 The summary formatter does not print before/after values by default, even if the structured report already contains values. To print those values, both the comparison and formatting calls must opt in:

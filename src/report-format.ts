@@ -4,6 +4,7 @@ import type {
   PayloadChange,
 } from "./change-model.js";
 import type { JsonValue } from "./json-value.js";
+import { escapeDisplayControls } from "./display-escape.js";
 
 /**
  * Escape terminal controls for the readable report only. The raw RFC 6901
@@ -12,19 +13,7 @@ import type { JsonValue } from "./json-value.js";
  */
 function formatPath(path: string): string {
   if (path === "") return "<root>";
-  return path.replace(
-    /[\\\u0000-\u001f\u007f-\u009f\u2028\u2029\u202a-\u202e\u2066-\u2069]/g,
-    (character) => {
-      switch (character) {
-        case "\\": return "\\\\";
-        case "\n": return "\\n";
-        case "\r": return "\\r";
-        case "\t": return "\\t";
-        default:
-          return "\\u" + character.charCodeAt(0).toString(16).padStart(4, "0");
-      }
-    },
-  );
+  return escapeDisplayControls(path.replace(/\\/g, "\\\\"));
 }
 
 /**
@@ -44,12 +33,12 @@ function formatJsonValue(value: JsonValue): string {
     const object = value as Readonly<Record<string, JsonValue>>;
     const entries = Object.keys(object)
       .sort()
-      .map((key) => `${JSON.stringify(key)}: ${formatJsonValue(object[key]!)}`);
+      .map((key) => `${escapeDisplayControls(JSON.stringify(key))}: ${formatJsonValue(object[key]!)}`);
 
     return `{${entries.join(", ")}}`;
   }
 
-  return JSON.stringify(value) ?? String(value);
+  return escapeDisplayControls(JSON.stringify(value) ?? String(value));
 }
 
 function formatChange(change: PayloadChange, includeValues: boolean): string {

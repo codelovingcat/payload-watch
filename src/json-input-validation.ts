@@ -1,4 +1,5 @@
 import { appendPointerSegment } from "./json-pointer.js";
+import { escapeDisplayControls } from "./display-escape.js";
 
 export class InvalidJsonInputError extends TypeError {
   readonly input: "previousPayload" | "currentPayload";
@@ -10,10 +11,10 @@ export class InvalidJsonInputError extends TypeError {
     path: string,
     reason: string,
   ) {
-    super(
+    super(escapeDisplayControls(
       "Invalid JSON input for " + input + " at JSON Pointer " +
       JSON.stringify(path) + ": " + reason + ".",
-    );
+    ));
     this.name = "InvalidJsonInputError";
     this.input = input;
     this.path = path;

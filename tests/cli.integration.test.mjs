@@ -183,3 +183,40 @@ describe("cross-platform CLI filesystem paths", () => {
     }
   });
 });
+
+describe("safe CLI error display", () => {
+  const unsafe = /[\u0000-\u0009\u000b-\u001f\u007f-\u009f\u061c\u200e\u200f\u2028\u2029\u202a-\u202e\u2066-\u2069]/;
+
+  it("escapes controls in unknown option arguments", () => {
+    const p = run("compare", "--unknown\nFORGED\r\t\u001b[31m\u009b\u202e");
+    assert.equal(p.status, 2);
+    assert.equal(p.stdout, "");
+    assert.ok(!unsafe.test(p.stderr));
+    assert.equal(p.stderr.trimEnd().split("\n").length, 1);
+    assert.match(p.stderr, /Unknown option:/);
+    assert.ok(p.stderr.includes("\\u001b"));
+    assert.ok(p.stderr.includes("\\u009b"));
+  });
+
+  it("escapes validation paths on stderr and preserves successful JSON output paths", () => {
+    const dir = mkdtempSync(join(tmpdir(), "payload-watch-error-display-"));
+    try {
+      const before = join(dir, "before.json"), after = join(dir, "after.json");
+      const key = "key\u009b2J\u202e\u2028\u061c\u200e\u200f";
+      writeFileSync(before, "{}");
+      writeFileSync(after, JSON.stringify({ [key]: 0 }).replace(":0", ":1e400"));
+      const invalid = run("compare", before, after);
+      assert.equal(invalid.status, 2);
+      assert.equal(invalid.stdout, "");
+      assert.ok(!unsafe.test(invalid.stderr));
+      assert.equal(invalid.stderr.trimEnd().split("\n").length, 1);
+      assert.ok(invalid.stderr.includes("\\u009b"));
+      writeFileSync(after, JSON.stringify({ [key]: 1 }));
+      const valid = run("compare", "--format=json", before, after);
+      assert.equal(valid.status, 0, valid.stderr);
+      assert.equal(JSON.parse(valid.stdout).changes[0].path, "/" + key);
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+});

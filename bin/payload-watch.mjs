@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 import { readFile } from "node:fs/promises";
 import { comparePayloads, formatComparisonReport, InvalidJsonInputError } from "../dist/index.js";
+import { escapeDisplayControls } from "../dist/display-escape.js";
 
 const USAGE = "Usage: payload-watch compare [--format text|json] [--fail-on-change] <previous.json> <current.json>";
 function fail(message) {
-  process.stderr.write("payload-watch: " + message + "\n");
+  process.stderr.write("payload-watch: " + escapeDisplayControls(message) + "\n");
   process.exitCode = 2;
 }
 function parse(argv) {
@@ -29,7 +30,7 @@ function parse(argv) {
       if (failOnChange) throw new Error("Specify --fail-on-change only once");
       failOnChange = true;
     } else if (token.startsWith("-")) {
-      throw new Error("Unknown option: " + token);
+      throw new Error("Unknown option: " + JSON.stringify(token));
     } else {
       paths.push(token);
     }
