@@ -2,7 +2,7 @@
 
 **Tracking issue:** [#24 — API reference and troubleshooting](https://github.com/codelovingcat/payload-watch/issues/24)
 
-This reference describes the **currently implemented** ESM-only API from `src/index.ts`. The project is not yet published on npm (`private: true`); use a source checkout or a locally installed package archive for now. The **core library** does not fetch APIs, capture snapshots, read files, run CLI commands or persist data. A separate, optional local-file [CLI](cli.md) is included in this candidate.
+This reference describes the **currently implemented** ESM-only API from `src/index.ts`. The project is not yet published on npm; use a source checkout or a locally installed package archive for now. The **core library** does not fetch APIs, capture snapshots, read files, run CLI commands or persist data. A separate, optional local-file [CLI](cli.md) is included in this candidate.
 
 ## Setup
 
@@ -176,7 +176,7 @@ For more: [Comparison Semantics](comparison-semantics.md), [Array Policy](array-
 
 ## 4. Realistic order API drift example
 
-The repository includes entirely **fictional** snapshots at [`examples/order-payloads/`](../examples/order-payloads/). A previous order uses a numeric `orderId`, `customer.name`, standard delivery, and two items. The later snapshot changes the ID to a string, uses `customer.fullName`, changes shipping and quantities, and adds an item.
+The repository includes entirely **fictional** snapshots at [`examples/order-payloads/`](https://github.com/codelovingcat/payload-watch/tree/main/examples/order-payloads). A previous order uses a numeric `orderId`, `customer.name`, standard delivery, and two items. The later snapshot changes the ID to a string, uses `customer.fullName`, changes shipping and quantities, and adds an item.
 
 ```js
 import { readFileSync } from "node:fs";

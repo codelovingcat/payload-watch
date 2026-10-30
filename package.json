@@ -1,7 +1,7 @@
 {
   "name": "payload-watch",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
   "description": "A TypeScript-first library for detecting and explaining changes in JSON API payloads.",
   "type": "module",
   "main": "./dist/index.js",
@@ -17,7 +17,8 @@
     "node": ">=22.12.0"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "clean": "node --input-type=module -e \"import { rmSync } from 'node:fs'; rmSync('dist', { recursive: true, force: true });\"",
+    "build": "npm run clean && tsc -p tsconfig.json",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -27,7 +28,10 @@
     "test:cli": "node --test tests/cli.integration.test.mjs",
     "release:preflight": "node scripts/release-preflight.mjs",
     "test:release-preflight": "node --test tests/release-preflight.test.mjs",
-    "check:release-candidate": "node scripts/check-release-candidate.mjs"
+    "check:release-candidate": "node scripts/check-release-candidate.mjs",
+    "release:verify": "npm run build && npm run typecheck && npm test && npm run test:cli && npm run test:release-preflight && npm run check:package && npm run check:consumer && node examples/api-reference.mjs && node scripts/verify-post-mvp-scenarios.mjs && npm run check:release-candidate && npm run release:preflight",
+    "prepack": "npm run build",
+    "prepublishOnly": "npm run release:verify"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
@@ -38,10 +42,15 @@
   "files": [
     "dist/",
     "README.md",
+    "CHANGELOG.md",
     "docs/",
     "bin/"
   ],
   "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "bin": {
     "payload-watch": "./bin/payload-watch.mjs"
   },

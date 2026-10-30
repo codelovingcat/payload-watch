@@ -34,7 +34,7 @@ function runNpm(args, cwd) {
 const tempRoot = mkdtempSync(join(tmpdir(), "payload-watch-package-check-"));
 try {
   const packageMetadata = JSON.parse(readFileSync(join(repositoryRoot, "package.json"), "utf8"));
-  assert.equal(packageMetadata.private, true, "The package must remain private before release");
+  assert.equal(packageMetadata.private, false, "Release metadata must permit public publication");
   assert.equal(packageMetadata.license, "MIT", "Package SPDX license must match LICENSE");
   assert.equal(packageMetadata.type, "module");
   assert.equal(packageMetadata.main, "./dist/index.js");
@@ -43,18 +43,19 @@ try {
   assert.equal(packageMetadata.exports["."].types, "./dist/index.d.ts");
 
   const packed = JSON.parse(runNpm([
-    "pack", "--json", "--ignore-scripts", "--pack-destination", tempRoot,
+    // Publish dry-run settings are inherited; this temporary archive must exist.
+    "pack", "--dry-run=false", "--json", "--ignore-scripts", "--pack-destination", tempRoot,
   ], repositoryRoot));
   assert.equal(packed.length, 1, "Expected one npm tarball");
 
   const entry = packed[0];
   const files = entry.files.map((file) => file.path);
-  for (const required of ["package.json", "LICENSE", "dist/index.js", "dist/index.d.ts", "bin/payload-watch.mjs"]) {
+  for (const required of ["package.json", "LICENSE", "README.md", "CHANGELOG.md", "dist/index.js", "dist/index.d.ts", "bin/payload-watch.mjs"]) {
     assert.ok(files.includes(required), `Package is missing ${required}`);
   }
   for (const path of files) {
     assert.ok(
-      path === "package.json" || path === "LICENSE" || path === "README.md" || path.startsWith("dist/") || path.startsWith("docs/") || path.startsWith("bin/"),
+      path === "package.json" || path === "LICENSE" || path === "README.md" || path === "CHANGELOG.md" || path.startsWith("dist/") || path.startsWith("docs/") || path.startsWith("bin/"),
       `Unexpected packed file: ${path}`,
     );
     assert.ok(!path.split("/").some((segment) => segment === ".env" || segment.startsWith(".env.")),
@@ -69,7 +70,7 @@ try {
 
   const tarballPath = join(tempRoot, entry.filename);
   runNpm([
-    "install", "--offline", "--ignore-scripts", "--no-audit", "--no-fund",
+    "install", "--dry-run=false", "--offline", "--ignore-scripts", "--no-audit", "--no-fund",
     "--no-save", "--package-lock=false", tarballPath,
   ], consumerRoot);
 

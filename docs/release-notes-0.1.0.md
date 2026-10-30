@@ -1,6 +1,6 @@
 # PayloadWatch 0.1.0 — first-release candidate notes
 
-**Status: NOT PUBLISHED.** This describes a proposed first public npm release, not an existing registry version. `package.json` and `package-lock.json` use `0.1.0`, but **`private: true` remains enabled**. No publish, public tag or GitHub Release has occurred.
+**Status: NOT PUBLISHED.** This describes a proposed first public npm release, not an existing registry version. `package.json` and `package-lock.json` use `0.1.0`, and `private: false` permits the planned public release. No publish, public tag or GitHub Release has occurred.
 
 ## Candidate functionality
 
@@ -12,7 +12,9 @@
 - Human-readable `formatComparisonReport`, with deliberate value opt-in both during comparison and formatting. Text-only JSON Pointer display escaping prevents control characters from injecting terminal/log output; structured pointer values remain unchanged.
 - Optional exact `ignorePaths` rules for suppressing noisy locations and descendants, including rule validation.
 - Optional local JSON CLI `payload-watch compare previous.json current.json` with text/JSON output and `--fail-on-change` (exit 0 valid, 1 changes with flag, 2 error). CI covers Windows file paths with spaces and non-ASCII characters.
-- MIT license, CHANGELOG, documentation, synthetic examples, and offline consumer package tests.
+- Strict CLI UTF-8 decoding with single-leading-BOM support; safe display escaping for values, paths and errors.
+- Embedded TypeScript source maps, tested README quick starts and automatic build/verification hooks before packing/publishing.
+- MIT license, bundled CHANGELOG, documentation, synthetic examples, and offline consumer package tests.
 
 ## Known limitations
 
@@ -38,7 +40,7 @@ node scripts/verify-post-mvp-scenarios.mjs
 npm pack --dry-run --json
 ```
 
-Actual public distribution requires a separate maintainer approval of the npm package name, scope, permissions, artifact, privacy, and 2FA/authentication. The existing `release:preflight` intentionally remains blocked while `private: true`. See [First Release Checklist](first-release-checklist.md).
+Actual public distribution requires a separate maintainer approval of the npm package name, scope, permissions, artifact, privacy, and 2FA/authentication. The metadata-only `release:preflight` now checks public registry/access settings and build/verification hooks; it does not authenticate or publish. See [First Release Checklist](first-release-checklist.md).
 
 To test an actual local archive, run `npm pack --ignore-scripts` and install the resulting `.tgz` file into a separate project. That is not the same as downloading a published version using npm.
 

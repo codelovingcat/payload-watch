@@ -67,8 +67,11 @@ jobs:
       - name: Replay post-MVP evaluation scenarios
         run: node scripts/verify-post-mvp-scenarios.mjs
 
-      - name: Verify private 0.1.0 release candidate
+      - name: Verify 0.1.0 release candidate
         run: npm run check:release-candidate
+
+      - name: Verify publication metadata without publishing
+        run: npm run release:preflight
 
   windows-cli:
     name: Windows CLI smoke (Node.js 22)

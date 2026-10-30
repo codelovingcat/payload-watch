@@ -27,7 +27,7 @@ function npm(args, cwd) {
 
 try {
   const pkg = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
-  assert.equal(pkg.private, true, "Release must remain gated");
+  assert.equal(pkg.private, false, "Release metadata must permit public publication");
   assert.equal(pkg.type, "module");
   assert.equal(pkg.main, "./dist/index.js");
   assert.equal(pkg.types, "./dist/index.d.ts");
@@ -37,14 +37,15 @@ try {
 
   const dry = JSON.parse(npm(["pack", "--dry-run", "--json", "--ignore-scripts"], root));
   const actual = JSON.parse(npm([
-    "pack", "--json", "--ignore-scripts", "--pack-destination", tempRoot,
+    // A publish dry run still needs a real local tarball for consumer validation.
+    "pack", "--dry-run=false", "--json", "--ignore-scripts", "--pack-destination", tempRoot,
   ], root));
   assert.equal(dry.length, 1);
   assert.equal(actual.length, 1);
   const dryPaths = dry[0].files.map((f) => f.path).sort();
   const actualPaths = actual[0].files.map((f) => f.path).sort();
   assert.deepEqual(actualPaths, dryPaths, "Dry-run and generated archive must contain the same files");
-  for (const path of ["package.json", "README.md", "dist/index.js", "dist/index.d.ts", "bin/payload-watch.mjs"]) {
+  for (const path of ["package.json", "README.md", "CHANGELOG.md", "dist/index.js", "dist/index.d.ts", "bin/payload-watch.mjs"]) {
     assert.ok(actualPaths.includes(path), `Missing packed file: ${path}`);
   }
   if (pkg.license) {
@@ -52,7 +53,7 @@ try {
   }
   for (const path of actualPaths) {
     assert.ok(
-      path === "package.json" || path === "README.md" || path === "LICENSE" ||
+      path === "package.json" || path === "README.md" || path === "LICENSE" || path === "CHANGELOG.md" ||
       path.startsWith("dist/") || path.startsWith("docs/") || path.startsWith("bin/"),
       `Unexpected file in archive: ${path}`,
     );
@@ -67,7 +68,7 @@ try {
   }, null, 2));
   const archivePath = join(tempRoot, actual[0].filename);
   assert.ok(existsSync(archivePath), "npm pack did not create the archive");
-  npm(["install", "--offline", "--ignore-scripts", "--no-audit", "--no-fund",
+  npm(["install", "--dry-run=false", "--offline", "--ignore-scripts", "--no-audit", "--no-fund",
        "--no-save", "--package-lock=false", archivePath], consumer);
 
   const installed = join(consumer, "node_modules", "payload-watch");
@@ -160,7 +161,34 @@ try {
     }, files: ["consumer-bundler.ts"],
   }, null, 2));
   run(process.execPath, [tsc, "-p", "tsconfig.bundler.json"], consumer);
+  // Execute the literal README examples against the installed tarball.
+  const readme = readFileSync(join(installed, "README.md"), "utf8");
+  const snippet = (name, language) => {
+    const start = `<!-- example:${name} -->\n\n\`\`\`${language}\n`;
+    const body = readme.split(start)[1]?.split("\n```", 1)[0];
+    assert.ok(body, `Missing README example: ${name}`);
+    return `${body}\n`;
+  };
+  writeFileSync(join(consumer, "readme.mjs"), snippet("javascript", "js"));
+  const expected = snippet("output", "text");
+  assert.equal(run(process.execPath, ["readme.mjs"], consumer), expected);
+  writeFileSync(join(consumer, "readme.ts"), snippet("typescript", "ts"));
+  const readmeConfig = JSON.parse(snippet("tsconfig", "json"));
+  writeFileSync(join(consumer, "tsconfig.readme.json"), JSON.stringify({
+    ...readmeConfig, files: ["readme.ts"],
+  }));
+  run(process.execPath, [tsc, "-p", "tsconfig.readme.json"], consumer);
+  assert.match(run(process.execPath, ["dist/readme.js"], consumer), /Type changed at \/id/);
+  for (const path of actualPaths.filter(path => path.endsWith(".md"))) {
+    const markdown = readFileSync(join(installed, path), "utf8");
+    for (const [, target] of markdown.matchAll(/\[[^\]]+\]\(([^\s)]+)\)/g)) {
+      if (/^(?:[a-z]+:|#)/i.test(target)) continue;
+      assert.ok(existsSync(resolve(dirname(join(installed, path)), target.split("#")[0])),
+        `Documentation link is missing from installed package: ${path} -> ${target}`);
+    }
+  }
   console.log(`Clean consumer verified on ${process.version}; ${actualPaths.length} packaged files; NodeNext runtime + types and Bundler types passed.`);
+  console.log("Installed README JavaScript, TypeScript, expected output and local links: passed.");
 } finally {
   rmSync(tempRoot, { recursive: true, force: true });
 }
