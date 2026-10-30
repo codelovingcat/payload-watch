@@ -147,6 +147,10 @@ For a reproducible local verification of the **actual npm tarball**, run `npm ci
 
 ## Supported inputs and comparison rules
 
+Nesting is limited to **512 levels from root depth 0**. Each object property or
+array element adds one level. Excess depth produces `InvalidJsonInputError`
+with the input and path (CLI exit `2`), including inside ignored subtrees.
+
 The public input type is `JsonValue`: a JSON object, array, string, finite number, boolean, or `null`. Pass parsed data values, not a string containing serialized JSON. Runtime validation rejects unsupported JavaScript values before comparison and throws `InvalidJsonInputError` with the input name, a JSON Pointer path, and a concise reason. The error never serializes payload values; see [Issue #13](https://github.com/codelovingcat/payload-watch/issues/13) and the [JSON Input Contract](docs/json-input-contract.md).
 
 PayloadWatch reports four change kinds:

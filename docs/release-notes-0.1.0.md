@@ -8,6 +8,7 @@
 - Deterministic nested object traversal, arrays by index, and distinction between missing fields and explicit `null`.
 - ESM root exports and generated TypeScript declarations; Node.js 22.12+ minimum. CI validates the full suite on Linux Node.js 22/24 and targeted CLI workflows on Windows Node.js 22.
 - Path-aware `InvalidJsonInputError` on invalid inputs; reports omit before/after values by default.
+- Defined nesting limit: root depth 0, maximum depth 512. Excess depth raises `InvalidJsonInputError` with the input/path; the CLI returns exit 2. Object/array boundaries and included-value formatting are regression-tested.
 - Human-readable `formatComparisonReport`, with deliberate value opt-in both during comparison and formatting. Text-only JSON Pointer display escaping prevents control characters from injecting terminal/log output; structured pointer values remain unchanged.
 - Optional exact `ignorePaths` rules for suppressing noisy locations and descendants, including rule validation.
 - Optional local JSON CLI `payload-watch compare previous.json current.json` with text/JSON output and `--fail-on-change` (exit 0 valid, 1 changes with flag, 2 error). CI covers Windows file paths with spaces and non-ASCII characters.

@@ -35,6 +35,21 @@ The root input may be an object, array, string, finite number, boolean, or `null
 
 These types are exported from the package entry point as type-only exports. They describe valid inputs at compile time; they cannot express every runtime condition (for example, finite numbers or circular references), so runtime validation is still required.
 
+### Nesting boundary
+
+The maximum supported depth is **512**, with the root at depth **0**. Each object
+property or array element increases depth by one; escaped slashes within a key
+do not add levels. Primitive values and empty containers at depth 512 are valid.
+A value at depth 513 is rejected with `InvalidJsonInputError`, identifying the
+input and offending JSON Pointer. Validation checks this boundary before
+descending further, avoiding a raw call-stack overflow on excessively deep data.
+
+This check also applies to ignored subtrees: `ignorePaths` does not bypass input
+validation. Comparisons, included value snapshots and formatting of generated
+reports are tested at the boundary. The CLI applies the same validation after
+JSON parsing and returns exit code `2` on excess depth. This depth boundary does
+not impose a byte-size limit or a performance guarantee for large documents.
+
 ## 3. Values that are not valid JSON inputs
 
 PayloadWatch accepts JSON data, not arbitrary JavaScript object graphs. Runtime input validation is expected to reject unsupported values instead of silently coercing them or generating a misleading comparison.

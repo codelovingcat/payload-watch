@@ -43,6 +43,10 @@ function comparePayloads(
 
 A root input may be `null`, a finite number, boolean, string, array, or plain JSON object. Pass parsed JSON **values**, not serialized JSON text, if you intend a structural comparison.
 
+The maximum depth is **512**, counting the root as 0 and each property/array
+element as one further level. Deeper values throw `InvalidJsonInputError` at the
+first offending path. This validation also covers ignored subtrees.
+
 Minimal example (one primitive value change):
 
 ```js
@@ -223,7 +227,7 @@ The `payload-watch compare` executable supports `--format text|json` (also `--fo
 | `/a~1b` or `/x~0y` looks odd. | These are escaped JSON Pointer keys: `~1` decodes to `/`, `~0` to `~`. |
 | `includeValues: true` but no values appear in text. | Opt in on **both** `comparePayloads` and `formatComparisonReport`. The structured report may already contain sensitive values. |
 | No changes are reported though business behavior changed. | This utility compares **observed JSON**, not API schemas, business rules or contract compatibility. Equal snapshots cannot reveal unobserved behavior changes. |
-| Deep nesting consumes excessive memory or fails at runtime. | Comparison and validation are recursive. No guaranteed maximum depth or size has been established; see [Performance Benchmark](performance-benchmark.md). |
+| `InvalidJsonInputError` reports excessive nesting. | The supported maximum is depth 512 (root depth 0). Reduce nesting or split the document. Byte size and execution time remain unbounded by the API; see [Performance Benchmark](performance-benchmark.md). |
 
 ## 6. Current limitations
 
@@ -231,7 +235,7 @@ The `payload-watch compare` executable supports `--format text|json` (also `--fo
 - **No identity-aware array diffs:** no key matching, move detection or reorder interpretation.
 - **No schema inference, HTTP fetching, watch mode, or durable snapshot storage** in the core library. Opt-in exact `ignorePaths` and the separate local-file CLI are included in the `0.1.0` candidate.
 - **No general automatic redaction:** use the default value-free report, or safely handle opt-in values and JSON Pointer paths.
-- **Synchronous and recursive:** very large or unusually deep payloads have not been assigned a guaranteed limit or performance SLA.
+- **Synchronous and recursive:** nesting is limited to 512 levels from root depth 0; excessive depth is rejected with a typed error. There is no guaranteed maximum byte size or performance SLA.
 - **Distribution not complete:** this is ESM-only, Node.js 22.12+, and **not yet published**. The repository is [MIT licensed](../LICENSE), though the `0.1.0` candidate is not yet published to npm.
 
 The executable examples and their expected output are checked in CI through `node examples/api-reference.mjs`, while Vitest covers the same comparison semantics independently of build output.
